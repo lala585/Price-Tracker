@@ -40,114 +40,114 @@ TARGET_SEARCHES = [
     # Coachmen RV Apex Nano 190RBS
     {"dealer": "Wilkins RV", "model": "Coachmen RV Apex Nano 190RBS", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=Apex+Nano+190RBS"},
     {"dealer": "Meyer's RV", "model": "Coachmen RV Apex Nano 190RBS", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=Apex+Nano+190RBS"},
-    {"dealer": "Colton RV", "model": "Coachmen RV Apex Nano 190RBS", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=Apex+Nano+190RBS"},
-    {"dealer": "Camping World", "model": "Coachmen RV Apex Nano 190RBS", "url": "https://www.campingworld.com/search?q=Apex+Nano+190RBS"},
-    {"dealer": "Seven Os RV", "model": "Coachmen RV Apex Nano 190RBS", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=Apex+Nano+190RBS"},
+    {"dealer": "Colton RV", "model": "Coachmen RV Apex Nano 190RBS", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=190RBS&s=true"},
+    {"dealer": "Camping World", "model": "Coachmen RV Apex Nano 190RBS", "url": "https://rv.campingworld.com/shop-rvs?query=apex%20nano%20190rbs"},
+    {"dealer": "Seven Os RV", "model": "Coachmen RV Apex Nano 190RBS", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=190RBS"},
 
     # Forest River Flagstaff Micro Lite 21FBRS
     {"dealer": "Wilkins RV", "model": "Forest River Flagstaff Micro Lite 21FBRS", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=21FBRS"},
     {"dealer": "Meyer's RV", "model": "Forest River Flagstaff Micro Lite 21FBRS", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=21FBRS"},
-    {"dealer": "Colton RV", "model": "Forest River Flagstaff Micro Lite 21FBRS", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=21FBRS"},
-    {"dealer": "Camping World", "model": "Forest River Flagstaff Micro Lite 21FBRS", "url": "https://www.campingworld.com/search?q=21FBRS"},
-    {"dealer": "Seven Os RV", "model": "Forest River Flagstaff Micro Lite 21FBRS", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=21FBRS"},
+    {"dealer": "Colton RV", "model": "Forest River Flagstaff Micro Lite 21FBRS", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=21FBRS&s=true"},
+    {"dealer": "Camping World", "model": "Forest River Flagstaff Micro Lite 21FBRS", "url": "https://rv.campingworld.com/shop-rvs?query=21fbrs"},
+    {"dealer": "Seven Os RV", "model": "Forest River Flagstaff Micro Lite 21FBRS", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=21FBRS"},
 
     # Coachmen RV Freedom Express Select 19SE
     {"dealer": "Wilkins RV", "model": "Coachmen RV Freedom Express Select 19SE", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=Freedom+Express+19SE"},
     {"dealer": "Meyer's RV", "model": "Coachmen RV Freedom Express Select 19SE", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=Freedom+Express+19SE"},
-    {"dealer": "Colton RV", "model": "Coachmen RV Freedom Express Select 19SE", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=Freedom+Express+19SE"},
-    {"dealer": "Camping World", "model": "Coachmen RV Freedom Express Select 19SE", "url": "https://www.campingworld.com/search?q=Freedom+Express+19SE"},
-    {"dealer": "Seven Os RV", "model": "Coachmen RV Freedom Express Select 19SE", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=Freedom+Express+19SE"},
+    {"dealer": "Colton RV", "model": "Coachmen RV Freedom Express Select 19SE", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=19SE&s=true"},
+    {"dealer": "Camping World", "model": "Coachmen RV Freedom Express Select 19SE", "url": "https://rv.campingworld.com/shop-rvs?query=freedom%20express%2019se"},
+    {"dealer": "Seven Os RV", "model": "Coachmen RV Freedom Express Select 19SE", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=19SE"},
 
     # Coachmen RV Freedom Express Ultra Lite 192RBS
     {"dealer": "Wilkins RV", "model": "Coachmen RV Freedom Express Ultra Lite 192RBS", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=Freedom+Express+192RBS"},
     {"dealer": "Meyer's RV", "model": "Coachmen RV Freedom Express Ultra Lite 192RBS", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=Freedom+Express+192RBS"},
-    {"dealer": "Colton RV", "model": "Coachmen RV Freedom Express Ultra Lite 192RBS", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=Freedom+Express+192RBS"},
-    {"dealer": "Camping World", "model": "Coachmen RV Freedom Express Ultra Lite 192RBS", "url": "https://www.campingworld.com/search?q=Freedom+Express+192RBS"},
-    {"dealer": "Seven Os RV", "model": "Coachmen RV Freedom Express Ultra Lite 192RBS", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=Freedom+Express+192RBS"},
+    {"dealer": "Colton RV", "model": "Coachmen RV Freedom Express Ultra Lite 192RBS", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=192RBS&s=true"},
+    {"dealer": "Camping World", "model": "Coachmen RV Freedom Express Ultra Lite 192RBS", "url": "https://rv.campingworld.com/shop-rvs?query=freedom%20express%20192rbs"},
+    {"dealer": "Seven Os RV", "model": "Coachmen RV Freedom Express Ultra Lite 192RBS", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=192RBS"},
 
     # East To West Longitude 185RB
     {"dealer": "Wilkins RV", "model": "East To West Longitude 185RB", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=Longitude+185RB"},
     {"dealer": "Meyer's RV", "model": "East To West Longitude 185RB", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=Longitude+185RB"},
-    {"dealer": "Colton RV", "model": "East To West Longitude 185RB", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=Longitude+185RB"},
-    {"dealer": "Camping World", "model": "East To West Longitude 185RB", "url": "https://www.campingworld.com/search?q=Longitude+185RB"},
-    {"dealer": "Seven Os RV", "model": "East To West Longitude 185RB", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=Longitude+185RB"},
+    {"dealer": "Colton RV", "model": "East To West Longitude 185RB", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=185RB&s=true"},
+    {"dealer": "Camping World", "model": "East To West Longitude 185RB", "url": "https://rv.campingworld.com/shop-rvs?query=longitude%20185rb"},
+    {"dealer": "Seven Os RV", "model": "East To West Longitude 185RB", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=185RB"},
 
     # Forest River r-pod RP-180
     {"dealer": "Wilkins RV", "model": "Forest River r-pod RP-180", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=RP-180"},
     {"dealer": "Meyer's RV", "model": "Forest River r-pod RP-180", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=RP-180"},
-    {"dealer": "Colton RV", "model": "Forest River r-pod RP-180", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=RP-180"},
-    {"dealer": "Camping World", "model": "Forest River r-pod RP-180", "url": "https://www.campingworld.com/search?q=RP-180"},
-    {"dealer": "Seven Os RV", "model": "Forest River r-pod RP-180", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=RP-180"},
+    {"dealer": "Colton RV", "model": "Forest River r-pod RP-180", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=RP-180&s=true"},
+    {"dealer": "Camping World", "model": "Forest River r-pod RP-180", "url": "https://rv.campingworld.com/shop-rvs?query=rp-180"},
+    {"dealer": "Seven Os RV", "model": "Forest River r-pod RP-180", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=RP-180"},
 
     # Forest River r-pod RP-190
     {"dealer": "Wilkins RV", "model": "Forest River r-pod RP-190", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=RP-190"},
     {"dealer": "Meyer's RV", "model": "Forest River r-pod RP-190", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=RP-190"},
-    {"dealer": "Colton RV", "model": "Forest River r-pod RP-190", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=RP-190"},
-    {"dealer": "Camping World", "model": "Forest River r-pod RP-190", "url": "https://www.campingworld.com/search?q=RP-190"},
-    {"dealer": "Seven Os RV", "model": "Forest River r-pod RP-190", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=RP-190"},
+    {"dealer": "Colton RV", "model": "Forest River r-pod RP-190", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=RP-190&s=true"},
+    {"dealer": "Camping World", "model": "Forest River r-pod RP-190", "url": "https://rv.campingworld.com/shop-rvs?query=rp-190"},
+    {"dealer": "Seven Os RV", "model": "Forest River r-pod RP-190", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=RP-190"},
 
     # Forest River Rockwood Mini Lite 2109S
     {"dealer": "Wilkins RV", "model": "Forest River Rockwood Mini Lite 2109S", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=2109S"},
     {"dealer": "Meyer's RV", "model": "Forest River Rockwood Mini Lite 2109S", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=2109S"},
-    {"dealer": "Colton RV", "model": "Forest River Rockwood Mini Lite 2109S", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=2109S"},
-    {"dealer": "Camping World", "model": "Forest River Rockwood Mini Lite 2109S", "url": "https://www.campingworld.com/search?q=2109S"},
-    {"dealer": "Seven Os RV", "model": "Forest River Rockwood Mini Lite 2109S", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=2109S"},
+    {"dealer": "Colton RV", "model": "Forest River Rockwood Mini Lite 2109S", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=2109S&s=true"},
+    {"dealer": "Camping World", "model": "Forest River Rockwood Mini Lite 2109S", "url": "https://rv.campingworld.com/shop-rvs?query=2109s"},
+    {"dealer": "Seven Os RV", "model": "Forest River Rockwood Mini Lite 2109S", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=2109S"},
 
     # Venture RV Sonic Lite 169VRK
     {"dealer": "Wilkins RV", "model": "Venture RV Sonic Lite 169VRK", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=169VRK"},
     {"dealer": "Meyer's RV", "model": "Venture RV Sonic Lite 169VRK", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=169VRK"},
-    {"dealer": "Colton RV", "model": "Venture RV Sonic Lite 169VRK", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=169VRK"},
-    {"dealer": "Camping World", "model": "Venture RV Sonic Lite 169VRK", "url": "https://www.campingworld.com/search?q=169VRK"},
-    {"dealer": "Seven Os RV", "model": "Venture RV Sonic Lite 169VRK", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=169VRK"},
+    {"dealer": "Colton RV", "model": "Venture RV Sonic Lite 169VRK", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=169VRK&s=true"},
+    {"dealer": "Camping World", "model": "Venture RV Sonic Lite 169VRK", "url": "https://rv.campingworld.com/shop-rvs?query=169vrk"},
+    {"dealer": "Seven Os RV", "model": "Venture RV Sonic Lite 169VRK", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=169VRK"},
 
     # Forest River Flagstaff E-Pro E19FBS
     {"dealer": "Wilkins RV", "model": "Forest River Flagstaff E-Pro E19FBS", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=E19FBS"},
     {"dealer": "Meyer's RV", "model": "Forest River Flagstaff E-Pro E19FBS", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=E19FBS"},
-    {"dealer": "Colton RV", "model": "Forest River Flagstaff E-Pro E19FBS", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=E19FBS"},
-    {"dealer": "Camping World", "model": "Forest River Flagstaff E-Pro E19FBS", "url": "https://www.campingworld.com/search?q=E19FBS"},
-    {"dealer": "Seven Os RV", "model": "Forest River Flagstaff E-Pro E19FBS", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=E19FBS"},
+    {"dealer": "Colton RV", "model": "Forest River Flagstaff E-Pro E19FBS", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=E19FBS&s=true"},
+    {"dealer": "Camping World", "model": "Forest River Flagstaff E-Pro E19FBS", "url": "https://rv.campingworld.com/shop-rvs?query=e19fbs"},
+    {"dealer": "Seven Os RV", "model": "Forest River Flagstaff E-Pro E19FBS", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=E19FBS"},
 
     # Forest River Ibex 16MBJ-BM
     {"dealer": "Wilkins RV", "model": "Forest River Ibex 16MBJ-BM", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=16MBJ"},
     {"dealer": "Meyer's RV", "model": "Forest River Ibex 16MBJ-BM", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=16MBJ"},
-    {"dealer": "Colton RV", "model": "Forest River Ibex 16MBJ-BM", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=16MBJ"},
-    {"dealer": "Camping World", "model": "Forest River Ibex 16MBJ-BM", "url": "https://www.campingworld.com/search?q=16MBJ"},
-    {"dealer": "Seven Os RV", "model": "Forest River Ibex 16MBJ-BM", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=16MBJ"},
+    {"dealer": "Colton RV", "model": "Forest River Ibex 16MBJ-BM", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=16MBJ&s=true"},
+    {"dealer": "Camping World", "model": "Forest River Ibex 16MBJ-BM", "url": "https://rv.campingworld.com/shop-rvs?query=16mbj"},
+    {"dealer": "Seven Os RV", "model": "Forest River Ibex 16MBJ-BM", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=16MBJ"},
 
     # Forest River No Boundaries NB18.2-BM
     {"dealer": "Wilkins RV", "model": "Forest River No Boundaries NB18.2-BM", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=NB18.2"},
     {"dealer": "Meyer's RV", "model": "Forest River No Boundaries NB18.2-BM", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=NB18.2"},
-    {"dealer": "Colton RV", "model": "Forest River No Boundaries NB18.2-BM", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=NB18.2"},
-    {"dealer": "Camping World", "model": "Forest River No Boundaries NB18.2-BM", "url": "https://www.campingworld.com/search?q=NB18.2"},
-    {"dealer": "Seven Os RV", "model": "Forest River No Boundaries NB18.2-BM", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=NB18.2"},
+    {"dealer": "Colton RV", "model": "Forest River No Boundaries NB18.2-BM", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=NB18.2&s=true"},
+    {"dealer": "Camping World", "model": "Forest River No Boundaries NB18.2-BM", "url": "https://rv.campingworld.com/shop-rvs?query=nb18.2"},
+    {"dealer": "Seven Os RV", "model": "Forest River No Boundaries NB18.2-BM", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=NB18.2"},
 
     # Forest River No Boundaries NB19.4
     {"dealer": "Wilkins RV", "model": "Forest River No Boundaries NB19.4", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=NB19.4"},
     {"dealer": "Meyer's RV", "model": "Forest River No Boundaries NB19.4", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=NB19.4"},
-    {"dealer": "Colton RV", "model": "Forest River No Boundaries NB19.4", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=NB19.4"},
-    {"dealer": "Camping World", "model": "Forest River No Boundaries NB19.4", "url": "https://www.campingworld.com/search?q=NB19.4"},
-    {"dealer": "Seven Os RV", "model": "Forest River No Boundaries NB19.4", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=NB19.4"},
+    {"dealer": "Colton RV", "model": "Forest River No Boundaries NB19.4", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=NB19.4&s=true"},
+    {"dealer": "Camping World", "model": "Forest River No Boundaries NB19.4", "url": "https://rv.campingworld.com/shop-rvs?query=nb19.4"},
+    {"dealer": "Seven Os RV", "model": "Forest River No Boundaries NB19.4", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=NB19.4"},
 
     # Forest River No Boundaries NB19.6
     {"dealer": "Wilkins RV", "model": "Forest River No Boundaries NB19.6", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=NB19.6"},
     {"dealer": "Meyer's RV", "model": "Forest River No Boundaries NB19.6", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=NB19.6"},
-    {"dealer": "Colton RV", "model": "Forest River No Boundaries NB19.6", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=NB19.6"},
-    {"dealer": "Camping World", "model": "Forest River No Boundaries NB19.6", "url": "https://www.campingworld.com/search?q=NB19.6"},
-    {"dealer": "Seven Os RV", "model": "Forest River No Boundaries NB19.6", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=NB19.6"},
+    {"dealer": "Colton RV", "model": "Forest River No Boundaries NB19.6", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=NB19.6&s=true"},
+    {"dealer": "Camping World", "model": "Forest River No Boundaries NB19.6", "url": "https://rv.campingworld.com/shop-rvs?query=nb19.6"},
+    {"dealer": "Seven Os RV", "model": "Forest River No Boundaries NB19.6", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=NB19.6"},
 
     # Forest River r-pod RP-198
     {"dealer": "Wilkins RV", "model": "Forest River r-pod RP-198", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=RP-198"},
     {"dealer": "Meyer's RV", "model": "Forest River r-pod RP-198", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=RP-198"},
-    {"dealer": "Colton RV", "model": "Forest River r-pod RP-198", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=RP-198"},
-    {"dealer": "Camping World", "model": "Forest River r-pod RP-198", "url": "https://www.campingworld.com/search?q=RP-198"},
-    {"dealer": "Seven Os RV", "model": "Forest River r-pod RP-198", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=RP-198"},
+    {"dealer": "Colton RV", "model": "Forest River r-pod RP-198", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=RP-198&s=true"},
+    {"dealer": "Camping World", "model": "Forest River r-pod RP-198", "url": "https://rv.campingworld.com/shop-rvs?query=rp-198"},
+    {"dealer": "Seven Os RV", "model": "Forest River r-pod RP-198", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=RP-198"},
 
     # Forest River r-pod RP-205
     {"dealer": "Wilkins RV", "model": "Forest River r-pod RP-205", "url": "https://www.wilkinsrv.com/rv-search?s=true&keyword=RP-205"},
     {"dealer": "Meyer's RV", "model": "Forest River r-pod RP-205", "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&keyword=RP-205"},
-    {"dealer": "Colton RV", "model": "Forest River r-pod RP-205", "url": "https://www.coltonrv.com/rv-search?s=true&keyword=RP-205"},
-    {"dealer": "Camping World", "model": "Forest River r-pod RP-205", "url": "https://www.campingworld.com/search?q=RP-205"},
-    {"dealer": "Seven Os RV", "model": "Forest River r-pod RP-205", "url": "https://www.sevenosrv.com/rv-search?s=true&keyword=RP-205"},
+    {"dealer": "Colton RV", "model": "Forest River r-pod RP-205", "url": "https://www.coltonrv.com/product/all-inventory?stocknumber=RP-205&s=true"},
+    {"dealer": "Camping World", "model": "Forest River r-pod RP-205", "url": "https://rv.campingworld.com/shop-rvs?query=rp-205"},
+    {"dealer": "Seven Os RV", "model": "Forest River r-pod RP-205", "url": "https://www.sevenos.com/rv-search?s=true&stocknumber=RP-205"},
 ]
 
 def clean_price(price_str):
@@ -262,16 +262,13 @@ def log_to_csv(records):
     logging.info(f"Appended {len(records)} records to {LOG_FILE}")
 
 def main():
-    all_records = []
     for target in TARGET_SEARCHES:
         units = check_dealership(target)
-        all_records.extend(units)
+        for unit in units:
+            log_to_csv([unit])
         time.sleep(2)  # Polite crawling delay between requests
-        
-    if all_records:
-        log_to_csv(all_records)
-    else:
-        logging.info("No matching units detected in this run.")
+
+    logging.info("Tracking run complete.")
 
 if __name__ == "__main__":
     main()
