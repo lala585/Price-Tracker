@@ -1,6 +1,6 @@
 """
-RV Price & Inventory Tracker (Playwright + DOM Diagnostics)
-============================================================
+RV Price & Inventory Tracker (Playwright + Resilient DOM Diagnostics)
+======================================================================
 Automated scraper for dealership inventory across Wilkins RV,
 Meyer's RV Superstores, Colton RV, and Seven O's RV.
 """
@@ -29,139 +29,7 @@ CSV_FIELDS = [
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 TARGET_SEARCHES = [
-    # --- Coachmen RV Apex Nano 190RBS ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Coachmen RV Apex Nano 190RBS",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=coachmen+rv&brand=apex+nano&keyword=190RBS"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Coachmen RV Apex Nano 190RBS",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=coachmen+rv&brand=apex+nano&keyword=190RBS"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Coachmen RV Apex Nano 190RBS",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=apex+nano&keyword=190RBS"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Coachmen RV Apex Nano 190RBS",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=apex+nano&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Forest River Flagstaff Micro Lite 21FBRS ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River Flagstaff Micro Lite 21FBRS",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=flagstaff+micro+lite&keyword=21FBRS"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River Flagstaff Micro Lite 21FBRS",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=flagstaff+micro+lite&keyword=21FBRS"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River Flagstaff Micro Lite 21FBRS",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=flagstaff+micro+lite&keyword=21FBRS"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River Flagstaff Micro Lite 21FBRS",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=flagstaff+micro+lite&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Coachmen RV Freedom Express Select 19SE ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Coachmen RV Freedom Express Select 19SE",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=coachmen+rv&brand=freedom+express+select&keyword=19SE"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Coachmen RV Freedom Express Select 19SE",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=coachmen+rv&brand=freedom+express+select&keyword=19SE"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Coachmen RV Freedom Express Select 19SE",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=freedom+express+select&keyword=19SE"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Coachmen RV Freedom Express Select 19SE",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=freedom+express+select&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Coachmen RV Freedom Express Ultra Lite 192RBS ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Coachmen RV Freedom Express Ultra Lite 192RBS",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=coachmen+rv&brand=freedom+express+ultra+lite&keyword=192RBS"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Coachmen RV Freedom Express Ultra Lite 192RBS",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=coachmen+rv&brand=freedom+express+ultra+lite&keyword=192RBS"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Coachmen RV Freedom Express Ultra Lite 192RBS",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=freedom+express+ultra+lite&keyword=192RBS"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Coachmen RV Freedom Express Ultra Lite 192RBS",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=freedom+express+ultra+lite&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- East To West Longitude 185RB ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "East To West Longitude 185RB",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=east+to+west&brand=longitude&keyword=185RB"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "East To West Longitude 185RB",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=east+to+west&brand=longitude&keyword=185RB"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "East To West Longitude 185RB",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=longitude&keyword=185RB"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "East To West Longitude 185RB",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=longitude&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Forest River r-pod RP-180 ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River r-pod RP-180",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=r+pod&keyword=RP-180"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River r-pod RP-180",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=r+pod&keyword=RP-180"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River r-pod RP-180",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=r+pod&keyword=RP-180"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River r-pod RP-180",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=r+pod&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Forest River r-pod RP-190 ---
+     # --- Forest River r-pod RP-190 ---
     {
         "dealer": "Wilkins RV",
         "model": "Forest River r-pod RP-190",
@@ -182,51 +50,6 @@ TARGET_SEARCHES = [
         "model": "Forest River r-pod RP-190",
         "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=r+pod&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
     },
-
-    # --- Forest River Rockwood Mini Lite 2109S ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River Rockwood Mini Lite 2109S",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=rockwood+mini+lite&keyword=2109S"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River Rockwood Mini Lite 2109S",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=rockwood+mini+lite&keyword=2109S"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River Rockwood Mini Lite 2109S",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=rockwood+mini+lite&keyword=2109S"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River Rockwood Mini Lite 2109S",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=rockwood+mini+lite&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Venture RV Sonic Lite 169VRK ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Venture RV Sonic Lite 169VRK",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=venture+rv&brand=sonic+lite&keyword=169VRK"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Venture RV Sonic Lite 169VRK",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=venture+rv&brand=sonic+lite&keyword=169VRK"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Venture RV Sonic Lite 169VRK",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=sonic+lite&keyword=169VRK"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Venture RV Sonic Lite 169VRK",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=sonic+lite&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
     # --- Forest River Flagstaff E-Pro E19FBS ---
     {
         "dealer": "Wilkins RV",
@@ -249,94 +72,6 @@ TARGET_SEARCHES = [
         "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=flagstaff+e+pro&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
     },
 
-    # --- Forest River Ibex 16MBJ-BM ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River Ibex 16MBJ-BM",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=ibex&keyword=16MBJ"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River Ibex 16MBJ-BM",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=ibex&keyword=16MBJ"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River Ibex 16MBJ-BM",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=ibex&keyword=16MBJ"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River Ibex 16MBJ-BM",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=ibex&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Forest River No Boundaries NB18.2-BM ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River No Boundaries NB18.2-BM",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=no+boundaries&keyword=NB18.2"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River No Boundaries NB18.2-BM",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=no+boundaries&keyword=NB18.2"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River No Boundaries NB18.2-BM",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=no+boundaries&keyword=NB18.2"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River No Boundaries NB18.2-BM",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=no+boundaries&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Forest River No Boundaries NB19.4 ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River No Boundaries NB19.4",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=no+boundaries&keyword=NB19.4"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River No Boundaries NB19.4",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=no+boundaries&keyword=NB19.4"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River No Boundaries NB19.4",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=no+boundaries&keyword=NB19.4"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River No Boundaries NB19.4",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=no+boundaries&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Forest River No Boundaries NB19.6 ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River No Boundaries NB19.6",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=no+boundaries&keyword=NB19.6"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River No Boundaries NB19.6",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=no+boundaries&keyword=NB19.6"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River No Boundaries NB19.6",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=no+boundaries&keyword=NB19.6"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River No Boundaries NB19.6",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=no+boundaries&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
     # --- Forest River r-pod RP-198 ---
     {
         "dealer": "Wilkins RV",
@@ -357,67 +92,6 @@ TARGET_SEARCHES = [
         "dealer": "Meyer's RV",
         "model": "Forest River r-pod RP-198",
         "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=r+pod&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Forest River r-pod RP-205 ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River r-pod RP-205",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=r+pod&keyword=RP-205"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River r-pod RP-205",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=r+pod&keyword=RP-205"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River r-pod RP-205",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=r+pod&keyword=RP-205"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River r-pod RP-205",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=r+pod&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-
-    # --- Forest River Rockwood Geo Pro G20SFK ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River Rockwood Geo Pro G20SFK",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=rockwood+geo+pro&keyword=G20SFK"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River Rockwood Geo Pro G20SFK",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=rockwood+geo+pro&keyword=G20SFK"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River Rockwood Geo Pro G20SFK",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=rockwood+geo+pro&keyword=G20SFK"
-    },
-
-    # --- Forest River Surveyor Legend 19RBLE ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River Surveyor Legend 19RBLE",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=surveyor+legend&keyword=19RBLE"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River Surveyor Legend 19RBLE",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=surveyor+legend&keyword=19RBLE"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River Surveyor Legend 19RBLE",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=surveyor+legend&keyword=19RBLE"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River Surveyor Legend 19RBLE",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=surveyor+legend&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
     },
 ]
 
@@ -462,7 +136,7 @@ def send_discord_alert(unit, old_price=None):
     }
     try:
         resp = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=10)
-        time.sleep(0.5)  # Prevents hitting Discord webhook rate limits
+        time.sleep(0.5)  # Avoid hitting Discord rate limits
         if resp.status_code not in (200, 204):
             logging.warning(f"Discord webhook error {resp.status_code}: {resp.text}")
     except Exception as e:
@@ -470,18 +144,24 @@ def send_discord_alert(unit, old_price=None):
 
 
 def parse_rendered_html(html, target):
-    """Extract listing information from the rendered DOM with detailed diagnostic logging."""
+    """Extract listing information with broad Dealer Spike, NetSource, and DOM structure support."""
     soup = BeautifulSoup(html, "html.parser")
     units = []
 
+    # Broad structural selectors matching Dealer Spike (v7/v8), NetSource, RVT, and WordPress layouts
     card_selectors = [
-        "div[class*='unit-item']",
-        "div[class*='vehicle-card']",
+        "[data-unit-id]",
+        "li.unit",
+        "li[class*='unit']",
+        "div[class*='unit-']",
+        "div[class*='-unit']",
+        "div[class*='v7list-item']",
+        "div[class*='vehicle-']",
         "div[class*='inventory-item']",
         "li[class*='inventory-item']",
         "div[class*='unit-tile']",
-        "div[class*='search-result-unit']",
-        "div[class*='listing-item']",
+        "div[class*='search-result']",
+        "div[class*='listing']",
         "article"
     ]
 
@@ -493,14 +173,25 @@ def parse_rendered_html(html, target):
                 seen.add(id(el))
                 cards.append(el)
 
-    logging.info(f"[{target['dealer']}] Found {len(cards)} raw card containers matching selectors.")
+    # Content-Driven Fallback: Find elements containing prices if class selectors failed
+    if not cards:
+        price_patterns = re.compile(r"\$\s?[0-9]{2,3},[0-9]{3}")
+        for elem in soup.find_all(["div", "li", "article"]):
+            if elem.name in ["div", "li", "article"] and price_patterns.search(elem.get_text()):
+                text_len = len(elem.get_text())
+                if 80 < text_len < 3000:
+                    if id(elem) not in seen and not any(id(p) in seen for p in elem.parents):
+                        seen.add(id(elem))
+                        cards.append(elem)
+
+    logging.info(f"[{target['dealer']}] Found {len(cards)} candidate containers.")
 
     if not cards:
         no_results_text = soup.find(string=re.compile(r"no (results|units|vehicles|inventory) found", re.I))
         if no_results_text:
             logging.info(f"[{target['dealer']}] Confirmed empty search result: '{no_results_text.strip()}'")
         else:
-            logging.warning(f"[{target['dealer']}] 0 containers found. Selectors did not match DOM structure.")
+            logging.warning(f"[{target['dealer']}] 0 containers found. Inspect the saved debug HTML snapshot.")
         return []
 
     dollar_count = 0
@@ -512,30 +203,33 @@ def parse_rendered_html(html, target):
             continue
         dollar_count += 1
 
-        # 1. Title Extraction
-        title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "name", "heading"]))
-        title = title_elem.get_text(strip=True) if title_elem else target["model"]
-
-        # 2. Price Extraction
+        # 1. Price Extraction
         price = None
-        price_elem = card.find(class_=lambda c: c and any(k in str(c).lower() for k in ["sale-price", "our-price", "special-price", "price"]))
+        price_elem = card.find(class_=lambda c: c and any(k in str(c).lower() for k in ["sale-price", "our-price", "special-price", "unit-price", "price"]))
         if price_elem:
             price = clean_price(price_elem.get_text(strip=True))
         if not price:
             matches = re.findall(r"\$\s?([0-9]{2,3},[0-9]{3})", card_text)
             if matches:
-                price = clean_price(matches[0])
+                valid_prices = [clean_price(m) for m in matches if clean_price(m) and clean_price(m) > 5000]
+                if valid_prices:
+                    price = min(valid_prices)
 
         if not price:
-            snippet = card_text[:120].replace("\n", " ")
-            logging.info(f"[{target['dealer']}] Card #{idx} had '$' but failed price parsing: '{snippet}...'")
             continue
 
         price_parsed_count += 1
 
+        # 2. Title Extraction
+        title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "name", "heading"]))
+        title = title_elem.get_text(strip=True) if title_elem else ""
+        if not title:
+            m = re.search(r"(202[0-9]\s+[A-Za-z0-9\s\-]+)", card_text)
+            title = m.group(1).strip() if m else target["model"]
+
         # 3. Stock / VIN Extraction
         stock = "N/A"
-        stock_match = re.search(r"(?:Stock|STK|VIN)\s*#?:?\s*([A-Za-z0-9\-]+)", card_text, re.IGNORECASE)
+        stock_match = re.search(r"(?:Stock|STK|VIN|Unit\s*#?)\s*#?:?\s*([A-Za-z0-9\-]+)", card_text, re.IGNORECASE)
         if stock_match:
             stock = stock_match.group(1)
 
@@ -556,12 +250,12 @@ def parse_rendered_html(html, target):
             "source_url": target["url"]
         })
 
-    logging.info(f"[{target['dealer']}] Summary: {len(cards)} containers, {dollar_count} had '$', {price_parsed_count} yielded valid prices.")
+    logging.info(f"[{target['dealer']}] Parsed {len(units)} units from {len(cards)} containers.")
     return units
 
 
 def scrape_with_playwright(browser, target):
-    """Load target URL in headless browser, log network/DOM states, and extract listings."""
+    """Load target URL in headless browser, handle hydration delays, and extract DOM."""
     logging.info(f"Visiting {target['dealer']} -> {target['model']}...")
     context = browser.new_context(
         user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -585,7 +279,7 @@ def scrape_with_playwright(browser, target):
                 pass
 
         try:
-            page.wait_for_selector("[class*='price'], [class*='unit'], [class*='vehicle']", timeout=6000)
+            page.wait_for_selector("[class*='price'], [class*='unit'], [class*='vehicle'], [data-unit-id]", timeout=6000)
             logging.info(f"[{target['dealer']}] Selector wait resolved (found listing/price container).")
         except Exception:
             logging.warning(f"[{target['dealer']}] Timed out waiting 6s for price/unit selectors. Page title: '{page.title()}'")
