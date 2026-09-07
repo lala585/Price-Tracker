@@ -1,6 +1,6 @@
 """
-RV Price & Inventory Tracker (Playwright + Resilient DOM Diagnostics)
-======================================================================
+RV Price & Inventory Tracker (Strict Model & Price Filter)
+==========================================================
 Automated scraper for dealership inventory across Wilkins RV,
 Meyer's RV Superstores, Colton RV, and Seven O's RV.
 """
@@ -29,79 +29,72 @@ CSV_FIELDS = [
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 TARGET_SEARCHES = [
-     # --- Forest River r-pod RP-190 ---
+    # --- Coachmen RV Apex Nano 190RBS ---
     {
         "dealer": "Wilkins RV",
-        "model": "Forest River r-pod RP-190",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=r+pod&keyword=RP-190"
+        "model": "Coachmen RV Apex Nano 190RBS",
+        "model_key": "190RBS",
+        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=coachmen+rv&brand=apex+nano&keyword=190RBS"
     },
     {
         "dealer": "Colton RV",
-        "model": "Forest River r-pod RP-190",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=r+pod&keyword=RP-190"
+        "model": "Coachmen RV Apex Nano 190RBS",
+        "model_key": "190RBS",
+        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=coachmen+rv&brand=apex+nano&keyword=190RBS"
     },
     {
         "dealer": "Seven Os RV",
-        "model": "Forest River r-pod RP-190",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=r+pod&keyword=RP-190"
+        "model": "Coachmen RV Apex Nano 190RBS",
+        "model_key": "190RBS",
+        "url": "https://www.sevenos.com/rv-search?s=true&brand=apex+nano&keyword=190RBS"
     },
     {
         "dealer": "Meyer's RV",
-        "model": "Forest River r-pod RP-190",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=r+pod&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
-    # --- Forest River Flagstaff E-Pro E19FBS ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River Flagstaff E-Pro E19FBS",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=flagstaff+e+pro&keyword=E19FBS"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River Flagstaff E-Pro E19FBS",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=flagstaff+e+pro&keyword=E19FBS"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River Flagstaff E-Pro E19FBS",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=flagstaff+e+pro&keyword=E19FBS"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River Flagstaff E-Pro E19FBS",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=flagstaff+e+pro&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
+        "model": "Coachmen RV Apex Nano 190RBS",
+        "model_key": "190RBS",
+        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=apex+nano&keyword=190RBS&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
     },
 
-    # --- Forest River r-pod RP-198 ---
+    # --- Forest River Flagstaff Micro Lite 21FBRS ---
     {
         "dealer": "Wilkins RV",
-        "model": "Forest River r-pod RP-198",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=r+pod&keyword=RP-198"
+        "model": "Forest River Flagstaff Micro Lite 21FBRS",
+        "model_key": "21FBRS",
+        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=flagstaff+micro+lite&keyword=21FBRS"
     },
     {
         "dealer": "Colton RV",
-        "model": "Forest River r-pod RP-198",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=r+pod&keyword=RP-198"
+        "model": "Forest River Flagstaff Micro Lite 21FBRS",
+        "model_key": "21FBRS",
+        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=flagstaff+micro+lite&keyword=21FBRS"
     },
     {
         "dealer": "Seven Os RV",
-        "model": "Forest River r-pod RP-198",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=r+pod&keyword=RP-198"
+        "model": "Forest River Flagstaff Micro Lite 21FBRS",
+        "model_key": "21FBRS",
+        "url": "https://www.sevenos.com/rv-search?s=true&brand=flagstaff+micro+lite&keyword=21FBRS"
     },
     {
         "dealer": "Meyer's RV",
-        "model": "Forest River r-pod RP-198",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=r+pod&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
+        "model": "Forest River Flagstaff Micro Lite 21FBRS",
+        "model_key": "21FBRS",
+        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=flagstaff+micro+lite&keyword=21FBRS&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
     },
 ]
 
 
-def clean_price(price_str):
-    """Extract numeric value from currency strings."""
-    if not price_str:
+def extract_price(text):
+    """Find isolated dollar prices in card text (e.g., '$17,595' -> 17595)."""
+    if not text:
         return None
-    cleaned = "".join(c for c in str(price_str) if c.isdigit())
-    return int(cleaned) if cleaned else None
+    # Match standard currency formats: $14,995 or $14995
+    matches = re.findall(r"\$\s?([1-9][0-9]{1,2},[0-9]{3}|[1-9][0-9]{4,5})\b", text)
+    valid_prices = []
+    for m in matches:
+        cleaned = int(m.replace(",", "").strip())
+        if 8000 <= cleaned <= 180000:  # Sensible price boundary for lightweight travel trailers
+            valid_prices.append(cleaned)
+    return min(valid_prices) if valid_prices else None
 
 
 def send_discord_alert(unit, old_price=None):
@@ -136,7 +129,7 @@ def send_discord_alert(unit, old_price=None):
     }
     try:
         resp = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=10)
-        time.sleep(0.5)  # Avoid hitting Discord rate limits
+        time.sleep(0.5)
         if resp.status_code not in (200, 204):
             logging.warning(f"Discord webhook error {resp.status_code}: {resp.text}")
     except Exception as e:
@@ -144,24 +137,18 @@ def send_discord_alert(unit, old_price=None):
 
 
 def parse_rendered_html(html, target):
-    """Extract listing information with broad Dealer Spike, NetSource, and DOM structure support."""
+    """Extract listing information and strictly verify the target floorplan matches."""
     soup = BeautifulSoup(html, "html.parser")
     units = []
 
-    # Broad structural selectors matching Dealer Spike (v7/v8), NetSource, RVT, and WordPress layouts
     card_selectors = [
-        "[data-unit-id]",
         "li.unit",
-        "li[class*='unit']",
-        "div[class*='unit-']",
-        "div[class*='-unit']",
-        "div[class*='v7list-item']",
-        "div[class*='vehicle-']",
-        "div[class*='inventory-item']",
-        "li[class*='inventory-item']",
-        "div[class*='unit-tile']",
-        "div[class*='search-result']",
-        "div[class*='listing']",
+        "li[class*='unit-']",
+        "div.v7list-item",
+        "div[data-unit-id]",
+        "div.inventory-item",
+        "li.inventory-item",
+        "div.unit-tile",
         "article"
     ]
 
@@ -173,69 +160,46 @@ def parse_rendered_html(html, target):
                 seen.add(id(el))
                 cards.append(el)
 
-    # Content-Driven Fallback: Find elements containing prices if class selectors failed
-    if not cards:
-        price_patterns = re.compile(r"\$\s?[0-9]{2,3},[0-9]{3}")
-        for elem in soup.find_all(["div", "li", "article"]):
-            if elem.name in ["div", "li", "article"] and price_patterns.search(elem.get_text()):
-                text_len = len(elem.get_text())
-                if 80 < text_len < 3000:
-                    if id(elem) not in seen and not any(id(p) in seen for p in elem.parents):
-                        seen.add(id(elem))
-                        cards.append(elem)
+    target_key = target.get("model_key", "").upper()
 
-    logging.info(f"[{target['dealer']}] Found {len(cards)} candidate containers.")
-
-    if not cards:
-        no_results_text = soup.find(string=re.compile(r"no (results|units|vehicles|inventory) found", re.I))
-        if no_results_text:
-            logging.info(f"[{target['dealer']}] Confirmed empty search result: '{no_results_text.strip()}'")
-        else:
-            logging.warning(f"[{target['dealer']}] 0 containers found. Inspect the saved debug HTML snapshot.")
-        return []
-
-    dollar_count = 0
-    price_parsed_count = 0
-
-    for idx, card in enumerate(cards):
+    for card in cards:
         card_text = card.get_text(" ", strip=True)
         if "$" not in card_text:
             continue
-        dollar_count += 1
 
-        # 1. Price Extraction
-        price = None
-        price_elem = card.find(class_=lambda c: c and any(k in str(c).lower() for k in ["sale-price", "our-price", "special-price", "unit-price", "price"]))
-        if price_elem:
-            price = clean_price(price_elem.get_text(strip=True))
-        if not price:
-            matches = re.findall(r"\$\s?([0-9]{2,3},[0-9]{3})", card_text)
-            if matches:
-                valid_prices = [clean_price(m) for m in matches if clean_price(m) and clean_price(m) > 5000]
-                if valid_prices:
-                    price = min(valid_prices)
+        # 1. Title Extraction
+        title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "name", "heading"]))
+        raw_title = title_elem.get_text(strip=True) if title_elem else card_text[:120]
+        # Clean title to first clean line
+        title = raw_title.split("Stock")[0].split("VIN")[0].strip()
 
+        # 2. Strict Model Filtering
+        # Ensure the listing explicitly contains the target floorplan (e.g., '190', '19SE', '192RBS')
+        combined_identity = f"{title} {card_text}".upper()
+        clean_key = re.sub(r"[^A-Z0-9]", "", target_key)
+        clean_identity = re.sub(r"[^A-Z0-9]", "", combined_identity)
+
+        if clean_key and clean_key not in clean_identity:
+            continue  # Discard unrelated models on the lot (e.g. RP-171 when tracking RP-190)
+
+        # 3. Clean Price Extraction
+        price = extract_price(card_text)
         if not price:
             continue
 
-        price_parsed_count += 1
-
-        # 2. Title Extraction
-        title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "name", "heading"]))
-        title = title_elem.get_text(strip=True) if title_elem else ""
-        if not title:
-            m = re.search(r"(202[0-9]\s+[A-Za-z0-9\s\-]+)", card_text)
-            title = m.group(1).strip() if m else target["model"]
-
-        # 3. Stock / VIN Extraction
+        # 4. Stock / VIN Extraction
         stock = "N/A"
-        stock_match = re.search(r"(?:Stock|STK|VIN|Unit\s*#?)\s*#?:?\s*([A-Za-z0-9\-]+)", card_text, re.IGNORECASE)
+        stock_match = re.search(r"(?:Stock|STK|VIN)\s*#?:?\s*([A-Za-z0-9\-]+)", card_text, re.IGNORECASE)
         if stock_match:
             stock = stock_match.group(1)
 
-        # 4. Link
+        # 5. Link
         link_elem = card.find("a", href=True)
         link = urljoin(target["url"], link_elem["href"]) if link_elem else target["url"]
+
+        # De-duplicate entries already captured from inner elements
+        if any(u["url"] == link and u["stock"] == stock for u in units):
+            continue
 
         units.append({
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -250,7 +214,7 @@ def parse_rendered_html(html, target):
             "source_url": target["url"]
         })
 
-    logging.info(f"[{target['dealer']}] Parsed {len(units)} units from {len(cards)} containers.")
+    logging.info(f"[{target['dealer']}] Verified {len(units)} units matching floorplan '{target_key}'.")
     return units
 
 
@@ -266,7 +230,6 @@ def scrape_with_playwright(browser, target):
     try:
         response = page.goto(target["url"], timeout=45000, wait_until="load")
         http_status = response.status if response else "No Response"
-        logging.info(f"[{target['dealer']}] Page loaded. HTTP Status: {http_status} | Final URL: {page.url}")
 
         # Dismiss location/cookie overlays if present
         for btn_text in ["Accept", "Close", "Agree", "Continue"]:
@@ -274,32 +237,19 @@ def scrape_with_playwright(browser, target):
                 btn = page.locator(f"button:has-text('{btn_text}')").first
                 if btn.is_visible(timeout=1000):
                     btn.click()
-                    logging.info(f"[{target['dealer']}] Dismissed modal button: '{btn_text}'")
             except Exception:
                 pass
 
         try:
-            page.wait_for_selector("[class*='price'], [class*='unit'], [class*='vehicle'], [data-unit-id]", timeout=6000)
-            logging.info(f"[{target['dealer']}] Selector wait resolved (found listing/price container).")
+            page.wait_for_selector("[class*='price'], [class*='unit'], [data-unit-id]", timeout=6000)
         except Exception:
-            logging.warning(f"[{target['dealer']}] Timed out waiting 6s for price/unit selectors. Page title: '{page.title()}'")
+            pass
 
         page.evaluate("window.scrollBy(0, 700)")
         page.wait_for_timeout(1000)
 
         html_content = page.content()
         listings = parse_rendered_html(html_content, target)
-
-        if not listings:
-            safe_dealer = re.sub(r"\W+", "_", target["dealer"].lower())
-            safe_model = re.sub(r"\W+", "_", target["model"].lower())
-            debug_filename = f"debug_{safe_dealer}_{safe_model}.html"
-            with open(debug_filename, "w", encoding="utf-8") as f:
-                f.write(html_content)
-            logging.info(f"[{target['dealer']}] Saved DOM snapshot to {debug_filename} (HTML size: {len(html_content)} bytes)")
-        else:
-            logging.info(f"[{target['dealer']}] Successfully recorded {len(listings)} listings.")
-
         return listings
 
     except PlaywrightTimeoutError:
@@ -338,7 +288,7 @@ def main():
 
     if all_found:
         log_to_csv(all_found)
-        logging.info(f"Successfully recorded {len(all_found)} total units to {LOG_FILE}")
+        logging.info(f"Successfully recorded {len(all_found)} verified units to {LOG_FILE}")
     else:
         logging.info("No units parsed across any dealer search in this run.")
 
