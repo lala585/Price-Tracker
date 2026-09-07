@@ -29,57 +29,50 @@ CSV_FIELDS = [
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 TARGET_SEARCHES = [
-    # --- Coachmen RV Apex Nano 190RBS ---
+       # --- Forest River Rockwood Mini Lite 2109S ---
     {
         "dealer": "Wilkins RV",
-        "model": "Coachmen RV Apex Nano 190RBS",
-        "model_key": "190RBS",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=coachmen+rv&brand=apex+nano&keyword=190RBS"
+        "model": "Forest River Rockwood Mini Lite 2109S",
+        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=rockwood+mini+lite&keyword=2109S"
     },
     {
         "dealer": "Colton RV",
-        "model": "Coachmen RV Apex Nano 190RBS",
-        "model_key": "190RBS",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=coachmen+rv&brand=apex+nano&keyword=190RBS"
+        "model": "Forest River Rockwood Mini Lite 2109S",
+        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=rockwood+mini+lite&keyword=2109S"
     },
     {
         "dealer": "Seven Os RV",
-        "model": "Coachmen RV Apex Nano 190RBS",
-        "model_key": "190RBS",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=apex+nano&keyword=190RBS"
+        "model": "Forest River Rockwood Mini Lite 2109S",
+        "url": "https://www.sevenos.com/rv-search?s=true&brand=rockwood+mini+lite&keyword=2109S"
     },
     {
         "dealer": "Meyer's RV",
-        "model": "Coachmen RV Apex Nano 190RBS",
-        "model_key": "190RBS",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=apex+nano&keyword=190RBS&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
+        "model": "Forest River Rockwood Mini Lite 2109S",
+        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=rockwood+mini+lite&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
+    },
+      # --- Forest River Flagstaff E-Pro E19FBS ---
+    {
+        "dealer": "Wilkins RV",
+        "model": "Forest River Flagstaff E-Pro E19FBS",
+        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=flagstaff+e+pro&keyword=E19FBS"
+    },
+    {
+        "dealer": "Colton RV",
+        "model": "Forest River Flagstaff E-Pro E19FBS",
+        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=flagstaff+e+pro&keyword=E19FBS"
+    },
+    {
+        "dealer": "Seven Os RV",
+        "model": "Forest River Flagstaff E-Pro E19FBS",
+        "url": "https://www.sevenos.com/rv-search?s=true&brand=flagstaff+e+pro&keyword=E19FBS"
+    },
+    {
+        "dealer": "Meyer's RV",
+        "model": "Forest River Flagstaff E-Pro E19FBS",
+        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=flagstaff+e+pro&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
     },
 
-    # --- Forest River Flagstaff Micro Lite 21FBRS ---
-    {
-        "dealer": "Wilkins RV",
-        "model": "Forest River Flagstaff Micro Lite 21FBRS",
-        "model_key": "21FBRS",
-        "url": "https://www.wilkinsrv.com/rv-search?s=true&manufacturer=forest+river+rv&brand=flagstaff+micro+lite&keyword=21FBRS"
-    },
-    {
-        "dealer": "Colton RV",
-        "model": "Forest River Flagstaff Micro Lite 21FBRS",
-        "model_key": "21FBRS",
-        "url": "https://www.coltonrv.com/product/travel-trailer?s=true&manufacturer=forest+river+rv&brand=flagstaff+micro+lite&keyword=21FBRS"
-    },
-    {
-        "dealer": "Seven Os RV",
-        "model": "Forest River Flagstaff Micro Lite 21FBRS",
-        "model_key": "21FBRS",
-        "url": "https://www.sevenos.com/rv-search?s=true&brand=flagstaff+micro+lite&keyword=21FBRS"
-    },
-    {
-        "dealer": "Meyer's RV",
-        "model": "Forest River Flagstaff Micro Lite 21FBRS",
-        "model_key": "21FBRS",
-        "url": "https://www.meyersrvsuperstores.com/rv-search?s=true&types=29&brand=flagstaff+micro+lite&keyword=21FBRS&zip=14202&distance=200&lots=1109%2C1113%2C1724%2C1114%2C1116%2C1117%2C1390%2C1118"
-    },
+
 ]
 
 
