@@ -13,11 +13,18 @@ Features:
 
 import os
 import csv
+import json
+import re
+import tempfile
 import time
 import logging
 from datetime import datetime
+from importlib import import_module
+from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -34,6 +41,29 @@ HEADERS = {
 
 # CSV Log File
 LOG_FILE = "rv_price_history.csv"
+CSV_FIELDS = [
+    "timestamp", "dealer", "target_model", "listing_title", "price", "msrp",
+    "stock", "availability", "last_seen", "url", "source_url", "http_status",
+    "card_count", "scrape_error",
+]
+REQUEST_TIMEOUT = 20
+REQUEST_DELAY = 2
+USE_PLAYWRIGHT_FALLBACK = True # Set to True if some dealer pages require JavaScript rendering
+
+RETRY_POLICY = Retry(
+    total=3,
+    connect=3,
+    read=3,
+    status=3,
+    backoff_factor=1,
+    status_forcelist=(429, 500, 502, 503, 504),
+    allowed_methods=frozenset(["GET"]),
+    raise_on_status=False,
+)
+SESSION = requests.Session()
+SESSION.headers.update(HEADERS)
+SESSION.mount("https://", HTTPAdapter(max_retries=RETRY_POLICY))
+SESSION.mount("http://", HTTPAdapter(max_retries=RETRY_POLICY))
 
 # Target search URLs (Wilkins RV, Meyer's RV, Colton RV search endpoints)
 TARGET_SEARCHES = [
@@ -157,32 +187,75 @@ def clean_price(price_str):
     cleaned = "".join(c for c in str(price_str) if c.isdigit())
     return int(cleaned) if cleaned else None
 
-def parse_listing(card, dealer):
+def first_matching_element(card, selectors):
+    """Return the first element matching selectors in priority order."""
+    for selector in selectors:
+        element = card.select_one(selector)
+        if element:
+            return element
+    return None
+
+def parse_listing(card, dealer, page_url=""):
     """
     Generic card extractor for standard Dealer Spike / RV dealership CMS layouts.
     Adapts across Wilkins, Meyers, and Colton common HTML schemas.
     """
-    title, price, vin_stock = "Unknown Unit", None, "N/A"
+    title, price, msrp, vin_stock = "Unknown Unit", None, None, "N/A"
     
     # 1. Extract Title
-    title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "unit-title", "name"]))
+    title_elem = first_matching_element(card, [
+        "[class*='unit-title']", "[class*='vehicle-title']", "[class*='listing-title']",
+        "[class*='title']", "h1", "h2", "h3", "h4",
+    ])
     if title_elem:
         title = title_elem.get_text(strip=True)
         
-    # 2. Extract Price (Sale price / Our price preferred over MSRP)
-    price_elem = card.find(class_=lambda c: c and any(k in str(c).lower() for k in ["sale-price", "our-price", "unit-price", "special-price", "price"]))
+    # Prefer advertised sale prices and only use MSRP as a fallback.
+    price_elem = first_matching_element(card, [
+        ".sale-price", "[class*='sale-price']", ".our-price", "[class*='our-price']",
+        ".special-price", "[class*='special-price']", ".unit-price", "[class*='unit-price']",
+        ".price", "[class*='price']",
+    ])
     if price_elem:
         price = clean_price(price_elem.get_text(strip=True))
+
+    msrp_elem = first_matching_element(card, [
+        ".msrp", "[class*='msrp']", ".original-price", "[class*='original-price']",
+    ])
+    if msrp_elem:
+        msrp = clean_price(msrp_elem.get_text(strip=True))
         
     # 3. Extract Stock or VIN
-    stock_elem = card.find(class_=lambda c: c and any(k in str(c).lower() for k in ["stock", "vin"]))
+    stock_elem = first_matching_element(card, [
+        ".stock", "[class*='stock']", ".vin", "[class*='vin']",
+    ])
     if stock_elem:
         vin_stock = stock_elem.get_text(strip=True)
+
+    availability_elem = first_matching_element(card, [
+        ".availability", "[class*='availability']", ".status", "[class*='status']",
+    ])
+    availability = availability_elem.get_text(" ", strip=True) if availability_elem else "Unknown"
+    if availability == "Unknown":
+        card_text = card.get_text(" ", strip=True)
+        availability_match = re.search(
+            r"\b(in stock|available|sold|pending|unavailable|out of stock)\b",
+            card_text,
+            re.IGNORECASE,
+        )
+        if availability_match:
+            availability = availability_match.group(1).title()
+
+    link = card.select_one("a[href]")
+    listing_url = urljoin(page_url, link["href"]) if link else page_url
         
     return {
         "title": title,
         "price": price,
+        "msrp": msrp,
         "stock": vin_stock,
+        "availability": availability,
+        "url": listing_url,
     }
 
 def find_listing_cards(soup):
@@ -216,11 +289,74 @@ def find_listing_cards(soup):
 
     return cards
 
+def iter_json_objects(value):
+    """Yield dictionaries nested in JSON-LD arrays and graphs."""
+    if isinstance(value, dict):
+        yield value
+        for child in value.values():
+            yield from iter_json_objects(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from iter_json_objects(child)
+
+def parse_json_ld_listings(soup, target):
+    """Extract product listings from schema.org Product/Offer data when available."""
+    records = []
+    for script in soup.select("script[type='application/ld+json']"):
+        try:
+            payload = json.loads(script.string or script.get_text())
+        except (json.JSONDecodeError, TypeError):
+            continue
+
+        for item in iter_json_objects(payload):
+            item_type = item.get("@type", [])
+            item_types = item_type if isinstance(item_type, list) else [item_type]
+            if not any(str(item_type).lower() in {"product", "vehicle"} for item_type in item_types):
+                continue
+
+            offer = item.get("offers", {})
+            if isinstance(offer, list):
+                offer = offer[0] if offer else {}
+            price = clean_price(offer.get("price") or item.get("price"))
+            if not price:
+                continue
+
+            availability = offer.get("availability", "Unknown")
+            availability = str(availability).rsplit("/", 1)[-1].replace("InStock", "In Stock")
+            records.append({
+                "title": item.get("name", "Unknown Unit"),
+                "price": price,
+                "msrp": clean_price(item.get("msrp")),
+                "stock": item.get("sku") or item.get("mpn") or "N/A",
+                "availability": availability,
+                "url": urljoin(target["url"], item.get("url", target["url"])),
+            })
+    return records
+
+def fetch_with_playwright(url):
+    """Optionally fetch pages whose listings are rendered only by JavaScript."""
+    try:
+        sync_playwright = import_module("playwright.sync_api").sync_playwright
+    except ImportError:
+        logging.warning("JavaScript fallback requested, but Playwright is not installed.")
+        return None
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        page = browser.new_page(extra_http_headers=HEADERS)
+        response = page.goto(url, wait_until="networkidle", timeout=REQUEST_TIMEOUT * 1000)
+        html = page.content()
+        status = response.status if response else 200
+        browser.close()
+    return status, html
+
 def check_dealership(target):
     """Fetch search page and parse unit cards."""
     logging.info(f"Checking {target['dealer']} for {target['model']}...")
+    response_status = "request_error"
     try:
-        resp = requests.get(target["url"], headers=HEADERS, timeout=15)
+        resp = SESSION.get(target["url"], timeout=REQUEST_TIMEOUT)
+        response_status = resp.status_code
         if resp.status_code != 200:
             logging.warning(f"Failed to fetch {target['url']} (Status: {resp.status_code})")
             return []
@@ -229,10 +365,25 @@ def check_dealership(target):
         
         # Most dealer CMSs wrap units in listing cards, but the class names vary.
         cards = find_listing_cards(soup)
+        if not cards and USE_PLAYWRIGHT_FALLBACK:
+            rendered = fetch_with_playwright(target["url"])
+            if rendered:
+                response_status, rendered_html = rendered
+                soup = BeautifulSoup(rendered_html, "html.parser")
+                cards = find_listing_cards(soup)
+
+        if not cards:
+            dynamic_markers = soup.select("script[src*='chunk'], script[src*='bundle'], [data-reactroot]")
+            if dynamic_markers:
+                logging.warning(
+                    "%s returned no cards but appears JavaScript-rendered; "
+                    "set USE_PLAYWRIGHT_FALLBACK = True if needed.",
+                    target["dealer"],
+                )
         
         results = []
         for card in cards:
-            data = parse_listing(card, target["dealer"])
+            data = parse_listing(card, target["dealer"], target["url"])
             if data["price"]:
                 results.append({
                     "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -240,9 +391,41 @@ def check_dealership(target):
                     "target_model": target["model"],
                     "listing_title": data["title"],
                     "price": data["price"],
+                    "msrp": data["msrp"],
                     "stock": data["stock"],
-                    "url": target["url"]
+                    "availability": data["availability"],
+                    "last_seen": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                    "url": data["url"],
+                    "source_url": target["url"],
+                    "http_status": response_status,
+                    "card_count": len(cards),
+                    "scrape_error": "",
                 })
+
+        if not results:
+            for data in parse_json_ld_listings(soup, target):
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+                results.append({
+                    "timestamp": timestamp,
+                    "dealer": target["dealer"],
+                    "target_model": target["model"],
+                    "listing_title": data["title"],
+                    "price": data["price"],
+                    "msrp": data["msrp"],
+                    "stock": data["stock"],
+                    "availability": data["availability"],
+                    "last_seen": timestamp,
+                    "url": data["url"],
+                    "source_url": target["url"],
+                    "http_status": response_status,
+                    "card_count": len(cards),
+                    "scrape_error": "structured_data",
+                })
+
+        logging.info(
+            "%s: HTTP %s, %s cards, %s listings",
+            target["dealer"], response_status, len(cards), len(results),
+        )
         return results
     except Exception as e:
         logging.error(f"Error scraping {target['dealer']}: {e}")
@@ -250,23 +433,70 @@ def check_dealership(target):
 
 def log_to_csv(records):
     """Append new listings to persistent CSV file."""
-    file_exists = os.path.isfile(LOG_FILE)
-    fieldnames = ["timestamp", "dealer", "target_model", "listing_title", "price", "stock", "url"]
+    ensure_csv_schema()
+    file_exists = os.path.isfile(LOG_FILE) and os.path.getsize(LOG_FILE) > 0
     
     with open(LOG_FILE, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         if not file_exists:
             writer.writeheader()
         for r in records:
             writer.writerow(r)
     logging.info(f"Appended {len(records)} records to {LOG_FILE}")
 
+def ensure_csv_schema():
+    """Add new columns to an older history file without discarding its data."""
+    if not os.path.isfile(LOG_FILE) or os.path.getsize(LOG_FILE) == 0:
+        return
+
+    with open(LOG_FILE, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        existing_fields = reader.fieldnames or []
+        if existing_fields == CSV_FIELDS:
+            return
+        rows = list(reader)
+
+    temp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", newline="", encoding="utf-8", delete=False,
+            dir=os.path.dirname(os.path.abspath(LOG_FILE)),
+        ) as temp_file:
+            temp_path = temp_file.name
+            writer = csv.DictWriter(temp_file, fieldnames=CSV_FIELDS)
+            writer.writeheader()
+            for row in rows:
+                writer.writerow({field: row.get(field, "") for field in CSV_FIELDS})
+        os.replace(temp_path, LOG_FILE)
+        logging.info("Updated CSV history columns to the current schema.")
+    finally:
+        if temp_path and os.path.exists(temp_path):
+            os.remove(temp_path)
+
+def listing_key(listing):
+    """Create a stable key for duplicate listings found in one run."""
+    identity = listing.get("stock")
+    if not identity or identity == "N/A":
+        identity = f"{listing.get('url', '')}|{listing.get('listing_title', '')}"
+    return (
+        listing.get("dealer", ""),
+        listing.get("target_model", ""),
+        identity,
+        listing.get("price", ""),
+    )
+
 def main():
+    seen_keys = set()
     for target in TARGET_SEARCHES:
         units = check_dealership(target)
         for unit in units:
+            key = listing_key(unit)
+            if key in seen_keys:
+                logging.info("Skipping duplicate listing: %s", unit.get("listing_title"))
+                continue
+            seen_keys.add(key)
             log_to_csv([unit])
-        time.sleep(2)  # Polite crawling delay between requests
+        time.sleep(REQUEST_DELAY)  # Polite crawling delay between requests
 
     logging.info("Tracking run complete.")
 
