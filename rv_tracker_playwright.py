@@ -5,15 +5,18 @@ Automated scraper for dealership inventory across Wilkins RV,
 Meyer's RV Superstores, Colton RV, Seven O's RV, and Camping World.
 """
 
-import os
 import re
 import csv
-import json
 import logging
 from datetime import datetime
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+import os
+import json 
+
+
+DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -23,8 +26,6 @@ CSV_FIELDS = [
     "timestamp", "dealer", "target_model", "listing_title",
     "price", "msrp", "stock", "availability", "url", "source_url"
 ]
-
-DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 # Cleaned search URLs with relaxed keyword queries to maximize matches
 TARGET_SEARCHES = [
@@ -216,6 +217,53 @@ def log_to_csv(records):
             writer.writeheader()
         for r in records:
             writer.writerow(r)
+            
+def send_discord_alert(unit, old_price=None):
+    """Sends a rich embedded notification to a Discord channel."""
+    if not DISCORD_WEBHOOK_URL:
+        return
+
+    # Determine status & embed color
+    if old_price and unit["price"] < old_price:
+        drop = old_price - unit["price"]
+        title = f"PRICE DROP: {unit['target_model']}"
+        desc = f"**${drop:,} Price Cut!**\nOld Price: ~~${old_price:,}~~\n**New Price: ${unit['price']:,}**"
+        color = 5763719  # Bright Green
+    else:
+        title = f"New Listing: {unit['target_model']}"
+        desc = f"**Price: ${unit['price']:,}**"
+        color = 3447003  # Blue
+
+    payload = {
+        "username": "RV Tracker",
+        "avatar_url": "https://i.imgur.com/4M34hi2.png",
+        "embeds": [
+            {
+                "title": title,
+                "url": unit.get("url", ""),
+                "description": desc,
+                "color": color,
+                "fields": [
+                    {"name": "Dealership", "value": unit["dealer"], "inline": True},
+                    {"name": "Stock / VIN", "value": unit.get("stock", "N/A"), "inline": True},
+                    {"name": "Listing Title", "value": unit.get("listing_title", "N/A"), "inline": False}
+                ],
+                "footer": {"text": "Regional Inventory Alert (NY/PA/OH)"}
+            }
+        ]
+    }
+
+    try:
+        resp = requests.post(
+            DISCORD_WEBHOOK_URL,
+            data=json.dumps(payload),
+            headers={"Content-Type": "application/json"},
+            timeout=10
+        )
+        if resp.status_code not in (200, 204):
+            print(f"Discord alert error: {resp.status_code} - {resp.text}")
+    except Exception as e:
+        print(f"Failed to push to Discord: {e}")
 
 def main():
     with sync_playwright() as p:
