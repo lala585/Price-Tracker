@@ -1,6 +1,6 @@
 """
-RV Price & Inventory Tracker (Playwright + DOM Parser)
-======================================================
+RV Price & Inventory Tracker (Playwright + DOM Diagnostics)
+============================================================
 Automated scraper for dealership inventory across Wilkins RV,
 Meyer's RV Superstores, Colton RV, and Seven O's RV.
 """
@@ -9,9 +9,9 @@ import os
 import re
 import csv
 import json
+import time
 import logging
 import requests
-import time
 from datetime import datetime
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
@@ -461,16 +461,16 @@ def send_discord_alert(unit, old_price=None):
         }]
     }
     try:
-       resp = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=10)
-       time.sleep(0.5)  # Prevents hitting Discord webhook rate limits
-       if resp.status_code not in (200, 204):
+        resp = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=10)
+        time.sleep(0.5)  # Prevents hitting Discord webhook rate limits
+        if resp.status_code not in (200, 204):
             logging.warning(f"Discord webhook error {resp.status_code}: {resp.text}")
     except Exception as e:
         logging.error(f"Discord ping failed: {e}")
 
 
 def parse_rendered_html(html, target):
-    """Extract listing information from the rendered DOM."""
+    """Extract listing information from the rendered DOM with detailed diagnostic logging."""
     soup = BeautifulSoup(html, "html.parser")
     units = []
 
@@ -493,10 +493,24 @@ def parse_rendered_html(html, target):
                 seen.add(id(el))
                 cards.append(el)
 
-    for card in cards:
+    logging.info(f"[{target['dealer']}] Found {len(cards)} raw card containers matching selectors.")
+
+    if not cards:
+        no_results_text = soup.find(string=re.compile(r"no (results|units|vehicles|inventory) found", re.I))
+        if no_results_text:
+            logging.info(f"[{target['dealer']}] Confirmed empty search result: '{no_results_text.strip()}'")
+        else:
+            logging.warning(f"[{target['dealer']}] 0 containers found. Selectors did not match DOM structure.")
+        return []
+
+    dollar_count = 0
+    price_parsed_count = 0
+
+    for idx, card in enumerate(cards):
         card_text = card.get_text(" ", strip=True)
         if "$" not in card_text:
             continue
+        dollar_count += 1
 
         # 1. Title Extraction
         title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "name", "heading"]))
@@ -513,7 +527,11 @@ def parse_rendered_html(html, target):
                 price = clean_price(matches[0])
 
         if not price:
+            snippet = card_text[:120].replace("\n", " ")
+            logging.info(f"[{target['dealer']}] Card #{idx} had '$' but failed price parsing: '{snippet}...'")
             continue
+
+        price_parsed_count += 1
 
         # 3. Stock / VIN Extraction
         stock = "N/A"
@@ -538,11 +556,12 @@ def parse_rendered_html(html, target):
             "source_url": target["url"]
         })
 
+    logging.info(f"[{target['dealer']}] Summary: {len(cards)} containers, {dollar_count} had '$', {price_parsed_count} yielded valid prices.")
     return units
 
 
 def scrape_with_playwright(browser, target):
-    """Load target URL in headless browser, handle hydration delays, and extract DOM."""
+    """Load target URL in headless browser, log network/DOM states, and extract listings."""
     logging.info(f"Visiting {target['dealer']} -> {target['model']}...")
     context = browser.new_context(
         user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -551,7 +570,9 @@ def scrape_with_playwright(browser, target):
     page = context.new_page()
 
     try:
-        page.goto(target["url"], timeout=45000, wait_until="load")
+        response = page.goto(target["url"], timeout=45000, wait_until="load")
+        http_status = response.status if response else "No Response"
+        logging.info(f"[{target['dealer']}] Page loaded. HTTP Status: {http_status} | Final URL: {page.url}")
 
         # Dismiss location/cookie overlays if present
         for btn_text in ["Accept", "Close", "Agree", "Continue"]:
@@ -559,24 +580,36 @@ def scrape_with_playwright(browser, target):
                 btn = page.locator(f"button:has-text('{btn_text}')").first
                 if btn.is_visible(timeout=1000):
                     btn.click()
+                    logging.info(f"[{target['dealer']}] Dismissed modal button: '{btn_text}'")
             except Exception:
                 pass
 
         try:
             page.wait_for_selector("[class*='price'], [class*='unit'], [class*='vehicle']", timeout=6000)
+            logging.info(f"[{target['dealer']}] Selector wait resolved (found listing/price container).")
         except Exception:
-            pass
+            logging.warning(f"[{target['dealer']}] Timed out waiting 6s for price/unit selectors. Page title: '{page.title()}'")
 
         page.evaluate("window.scrollBy(0, 700)")
         page.wait_for_timeout(1000)
 
         html_content = page.content()
         listings = parse_rendered_html(html_content, target)
-        logging.info(f"Found {len(listings)} listings on {target['dealer']}")
+
+        if not listings:
+            safe_dealer = re.sub(r"\W+", "_", target["dealer"].lower())
+            safe_model = re.sub(r"\W+", "_", target["model"].lower())
+            debug_filename = f"debug_{safe_dealer}_{safe_model}.html"
+            with open(debug_filename, "w", encoding="utf-8") as f:
+                f.write(html_content)
+            logging.info(f"[{target['dealer']}] Saved DOM snapshot to {debug_filename} (HTML size: {len(html_content)} bytes)")
+        else:
+            logging.info(f"[{target['dealer']}] Successfully recorded {len(listings)} listings.")
+
         return listings
 
     except PlaywrightTimeoutError:
-        logging.warning(f"Timeout on {target['url']}")
+        logging.warning(f"Timeout navigating to {target['url']}")
         return []
     except Exception as e:
         logging.error(f"Scrape error on {target['dealer']}: {e}")
@@ -611,9 +644,9 @@ def main():
 
     if all_found:
         log_to_csv(all_found)
-        logging.info(f"Successfully recorded {len(all_found)} units to {LOG_FILE}")
+        logging.info(f"Successfully recorded {len(all_found)} total units to {LOG_FILE}")
     else:
-        logging.info("No units parsed in this run.")
+        logging.info("No units parsed across any dealer search in this run.")
 
 
 if __name__ == "__main__":
