@@ -3,7 +3,7 @@ name: RV Price Tracker
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 12 * * *"
+    - cron: "22 12 * * *"
 
 permissions:
   contents: read
