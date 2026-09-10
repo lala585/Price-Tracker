@@ -1,0 +1,9 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^python -m py_compile \\.\\\\rv_price_tracker\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        ".\\.venv\\Scripts\\python.exe": true
+    }
+}

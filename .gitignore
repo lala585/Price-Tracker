@@ -1,0 +1,30 @@
+# Python environments and caches
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Local tracker data
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+
+# Playwright output
+test-results/
+playwright-report/
+blob-report/
+
+# IDE and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
