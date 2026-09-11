@@ -88,6 +88,17 @@ DEALER_TEMPLATES = {
 
     # Northern Virginia (Dealer Spike / NetSource)
     "Restless Wheels RV (VA)": "https://www.restlesswheels.com/rv-search?s=true&types=29&brand={brand}&keyword={key}",
+
+    # Major Regional Multi-Store Networks
+    "General RV Center": "https://www.generalrv.com/rv-search?s=true&types=29&brand={brand}&keyword={key}",
+    "Camping World (NY/PA)": "https://rv.campingworld.com/rv-search?category=travel-trailer&keyword={key}",
+    
+    # Regional Finger Lakes & Western NY Independents
+    "Ballantyne RV (NY)": "https://www.ballantynerv.com/rv-search?s=true&brand={brand}&keyword={key}",
+    
+    # High-Volume Pennsylvania Dealerships
+    "Ansley RV (PA)": "https://www.ansleyrv.com/rv-search?s=true&brand={brand}&keyword={key}",
+    "Stoltzfus RV (PA)": "https://www.stoltzfusrv.com/rv-search?s=true&brand={brand}&keyword={key}",
 }
 
 STEALTH_SUITE_DEALERS = {
@@ -315,9 +326,11 @@ def build_targets_for_models(models):
 # =============================================================================
 
 def init_db():
-    """Create tracking and price history tables and auto-migrate missing columns."""
+    """Create tracking and price history tables, trigger, analytical view, and migrate columns."""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL;")
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS listings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -328,43 +341,94 @@ def init_db():
             model_year INTEGER,
             condition TEXT,
             current_price INTEGER NOT NULL,
+            original_price INTEGER,
             first_seen TEXT NOT NULL,
             last_seen TEXT NOT NULL,
+            status TEXT DEFAULT 'active',
             url TEXT,
             source_url TEXT,
             UNIQUE(dealer, stock)
         )
     """)
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS price_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             listing_id INTEGER NOT NULL,
             dealer TEXT NOT NULL,
             stock TEXT NOT NULL,
+            old_price INTEGER,
+            new_price INTEGER,
+            price_delta INTEGER,
             price INTEGER NOT NULL,
             recorded_at TEXT NOT NULL,
-            FOREIGN KEY (listing_id) REFERENCES listings(id)
+            FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE
         )
     """)
 
+    # Schema migration checks
     cursor.execute("PRAGMA table_info(listings)")
-    columns = [row[1] for row in cursor.fetchall()]
-
-    if "model_year" not in columns:
-        logging.info("Migrating schema: Adding 'model_year' column...")
+    cols = [r[1] for r in cursor.fetchall()]
+    if "original_price" not in cols:
+        cursor.execute("ALTER TABLE listings ADD COLUMN original_price INTEGER")
+        cursor.execute("UPDATE listings SET original_price = current_price WHERE original_price IS NULL")
+    if "status" not in cols:
+        cursor.execute("ALTER TABLE listings ADD COLUMN status TEXT DEFAULT 'active'")
+    if "model_year" not in cols:
         cursor.execute("ALTER TABLE listings ADD COLUMN model_year INTEGER")
-    if "condition" not in columns:
-        logging.info("Migrating schema: Adding 'condition' column...")
+    if "condition" not in cols:
         cursor.execute("ALTER TABLE listings ADD COLUMN condition TEXT")
+
+    # Automated Trigger for Price History
+    cursor.execute("""
+        CREATE TRIGGER IF NOT EXISTS trg_track_dealer_price_change
+        AFTER UPDATE OF current_price ON listings
+        WHEN OLD.current_price != NEW.current_price
+        BEGIN
+            INSERT INTO price_history (listing_id, dealer, stock, old_price, new_price, price_delta, price, recorded_at)
+            VALUES (
+                OLD.id,
+                OLD.dealer,
+                OLD.stock,
+                OLD.current_price,
+                NEW.current_price,
+                NEW.current_price - OLD.current_price,
+                NEW.current_price,
+                STRFTIME('%Y-%m-%d %H:%M:%S', 'now')
+            );
+        END;
+    """)
+
+    # Analytical View for Market Intelligence & Days on Lot
+    cursor.execute("""
+        CREATE VIEW IF NOT EXISTS v_active_market_intelligence AS
+        SELECT 
+            id,
+            dealer,
+            stock,
+            target_model,
+            model_year,
+            condition,
+            original_price,
+            current_price,
+            (COALESCE(original_price, current_price) - current_price) AS total_discount_amount,
+            ROUND(((COALESCE(original_price, current_price) - current_price) * 100.0 / NULLIF(original_price, 0)), 1) AS total_discount_pct,
+            CAST(julianday('now') - julianday(first_seen) AS INTEGER) AS days_on_lot,
+            CAST(julianday('now') - julianday(last_seen) AS INTEGER) AS days_since_last_seen,
+            url
+        FROM listings
+        WHERE status = 'active';
+    """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_dealer_listings_lookup ON listings(dealer, stock);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_dealer_price_hist ON price_history(listing_id);")
 
     conn.commit()
     conn.close()
 
 
 def sync_unit_to_db(unit):
-    """
-    Upsert unit into SQLite database with stable hashing and metadata refreshes.
-    """
+    """Upsert unit using SQLite trigger for history tracking."""
     stock = unit.get("stock")
     if not stock or stock == "N/A":
         url_key = unit.get("url", "").strip()
@@ -374,7 +438,7 @@ def sync_unit_to_db(unit):
 
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     cursor.execute(
         "SELECT id, current_price FROM listings WHERE dealer = ? AND stock = ?",
@@ -384,61 +448,51 @@ def sync_unit_to_db(unit):
 
     if row is None:
         cursor.execute("""
-            INSERT INTO listings (dealer, stock, target_model, listing_title, model_year, condition, current_price, first_seen, last_seen, url, source_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO listings (dealer, stock, target_model, listing_title, model_year, condition, 
+                                  current_price, original_price, first_seen, last_seen, status, url, source_url)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)
         """, (
             unit["dealer"], unit["stock"], unit["target_model"], unit["listing_title"],
-            unit.get("model_year"), unit.get("condition"), unit["price"], now_str, now_str,
-            unit["url"], unit["source_url"]
+            unit.get("model_year"), unit.get("condition"), unit["price"], unit["price"],
+            now_str, now_str, unit["url"], unit["source_url"]
         ))
-        listing_id = cursor.lastrowid
-        cursor.execute("""
-            INSERT INTO price_history (listing_id, dealer, stock, price, recorded_at)
-            VALUES (?, ?, ?, ?, ?)
-        """, (listing_id, unit["dealer"], unit["stock"], unit["price"], now_str))
         conn.commit()
         conn.close()
         return ("NEW", None)
 
     listing_id, old_price = row
+    cursor.execute("""
+        UPDATE listings 
+        SET current_price = ?, last_seen = ?, status = 'active', listing_title = ?, 
+            model_year = ?, condition = ?, url = ?
+        WHERE id = ?
+    """, (unit["price"], now_str, unit["listing_title"], unit.get("model_year"), unit.get("condition"), unit["url"], listing_id))
+    
+    conn.commit()
+    conn.close()
 
     if unit["price"] < old_price:
-        cursor.execute("""
-            UPDATE listings 
-            SET current_price = ?, last_seen = ?, listing_title = ?, model_year = ?, condition = ?, url = ?
-            WHERE id = ?
-        """, (unit["price"], now_str, unit["listing_title"], unit.get("model_year"), unit.get("condition"), unit["url"], listing_id))
-        cursor.execute("""
-            INSERT INTO price_history (listing_id, dealer, stock, price, recorded_at)
-            VALUES (?, ?, ?, ?, ?)
-        """, (listing_id, unit["dealer"], unit["stock"], unit["price"], now_str))
-        conn.commit()
-        conn.close()
         return ("DROP", old_price)
-
     elif unit["price"] > old_price:
-        cursor.execute("""
-            UPDATE listings 
-            SET current_price = ?, last_seen = ?, listing_title = ?, model_year = ?, condition = ?, url = ?
-            WHERE id = ?
-        """, (unit["price"], now_str, unit["listing_title"], unit.get("model_year"), unit.get("condition"), unit["url"], listing_id))
-        cursor.execute("""
-            INSERT INTO price_history (listing_id, dealer, stock, price, recorded_at)
-            VALUES (?, ?, ?, ?, ?)
-        """, (listing_id, unit["dealer"], unit["stock"], unit["price"], now_str))
-        conn.commit()
-        conn.close()
         return ("INCREASE", old_price)
+    return ("SAME", old_price)
 
-    else:
-        cursor.execute("""
-            UPDATE listings 
-            SET last_seen = ?, listing_title = ?, model_year = ?, condition = ?, url = ?
-            WHERE id = ?
-        """, (now_str, unit["listing_title"], unit.get("model_year"), unit.get("condition"), unit["url"], listing_id))
-        conn.commit()
-        conn.close()
-        return ("SAME", old_price)
+
+def mark_delisted_units(days_threshold=7):
+    """Marks units not discovered in recent scrapes as delisted."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE listings
+        SET status = 'delisted'
+        WHERE status = 'active'
+          AND (julianday('now') - julianday(last_seen)) > ?
+    """, (days_threshold,))
+    delisted_count = cursor.rowcount
+    conn.commit()
+    conn.close()
+    if delisted_count > 0:
+        logging.info(f"Delisted detection: Marked {delisted_count} inactive units as 'delisted'.")
 
 
 # =============================================================================
@@ -760,7 +814,7 @@ def main():
                 time.sleep(BATCH_COOLDOWN_SEC)
 
         browser.close()
-
+    mark_delisted_units(days_threshold=7)
     logging.info(
         f"\nTracker Run Finished: {total_found} parsed | {new_units} new alerts | "
         f"{price_drops} price cuts | Synced to {DB_FILE}"

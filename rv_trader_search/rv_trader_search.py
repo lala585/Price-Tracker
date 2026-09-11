@@ -1,15 +1,23 @@
 """
-Dual Aggregator RV Inventory Tracker (RV Trader & RVUSA)
-========================================================
-Tracks 27 lightweight travel trailer floorplans across:
-- RVTrader.com (Permissible paths under robots.txt)
-- RVUSA.com (NetSource Media catalog)
+Multi-Aggregator RV Inventory Tracker & Price-Drop Engine
+=========================================================
+Aggregators Included:
+- RVTrader.com
+- RVUSA.com
+- RVT.com
+- TrueRVs.com
+- RVEnvy.com
+- RVUniverse.com
+- RVs on Autotrader (rvs.autotrader.com)
+- RVPostings.com
+- SmartRVGuide.com
 
 Features:
-- Batched model chunks with polite human-like jitter (3-5s)
-- Deterministic ID resolution for both platforms
-- SQLite database storage with automatic price history recording
-- Discord webhook alerts for newly spotted units and price reductions
+- Polite human jitter delays (15s-25s) and batch resting (60s)
+- Automatic SQLite migration with days-on-lot triggers and price history
+- View creation for real-time market intelligence
+- Automated stale inventory delisting
+- Discord Webhook integration for price cuts and new listings
 """
 
 import os
@@ -27,22 +35,22 @@ from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeo
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-DB_FILE = "rv_trader_search/rvtrader_tracker.db" 
+DB_FILE = "rv_trader_search/rvtrader_tracker.db"
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 SEARCH_ZIP = "14218"
 SEARCH_RADIUS = "300"
 
 BATCH_SIZE = 4
-BATCH_REST_SECONDS = 60
-MIN_QUERY_DELAY = 15.0
-MAX_QUERY_DELAY = 25.0
+BATCH_REST_SECONDS = 40
+MIN_QUERY_DELAY = 10.0
+MAX_QUERY_DELAY = 20.0
 
 MIN_MODEL_YEAR = 2024
 MAX_MODEL_YEAR = 2027
 
 # =============================================================================
-# MODELS CATALOG
+# MODELS CATALOG (Standardized Tracking List)
 # =============================================================================
 
 MODELS_CATALOG = [
@@ -85,87 +93,46 @@ MODELS_CATALOG = [
 # =============================================================================
 # URL BUILDERS
 # =============================================================================
+
 def build_rvtrader_url(keyword, zip_code, radius):
-    base_url = "https://www.rvtrader.com/Travel-Trailer/rvs-for-sale"
-    params = {
-        "type": "Travel Trailer|198073",
-        "keyword": keyword,
-        "zip": zip_code,
-        "radius": radius
-    }
-    return f"{base_url}?{urllib.parse.urlencode(params)}"
-def build_rvuniverse_url(keyword):
-    """
-    Builds clean RVUniverse travel trailer search URLs avoiding disallowed paths
-    (/dealer/, /Compare/, /listinginput/, /ajax*, localized language prefixes, etc.)
-    """
-    base_url = "https://www.rvuniverse.com/listings/for-sale/travel-trailers/150012"
-    params = {
-        "Keywords": keyword
-    }
-    return f"{base_url}?{urllib.parse.urlencode(params)}"
+    return f"https://www.rvtrader.com/Travel-Trailer/rvs-for-sale?type=Travel%20Trailer%7C198073&keyword={urllib.parse.quote_plus(keyword)}&zip={zip_code}&radius={radius}"
+
 def build_rvusa_url(keyword):
-    base_url = "https://www.rvusa.com/travel-trailer-rvs-for-sale"
-    params = {
-        "type": "travel trailer",
-        "keyword": keyword
-    }
-    return f"{base_url}?{urllib.parse.urlencode(params)}"
+    return f"https://www.rvusa.com/travel-trailer-rvs-for-sale?type=travel+trailer&keyword={urllib.parse.quote_plus(keyword)}"
 
 def build_rvt_url(keyword, zip_code, radius):
-    """
-    Builds clean RVT.com search URLs avoiding disallowed paths
-    (calc.*, price-checker, srDisplay, etc.)
-    """
-    base_url = "https://www.rvt.com/rvs-for-sale"
-    params = {
-        "type": "Travel Trailer",
-        "keyword": keyword,
-        "zip": zip_code,
-        "distance": radius
-    }
-    return f"{base_url}?{urllib.parse.urlencode(params)}"
+    return f"https://www.rvt.com/rvs-for-sale?type=Travel+Trailer&keyword={urllib.parse.quote_plus(keyword)}&zip={zip_code}&distance={radius}"
+
+def build_truervs_url(keyword):
+    return f"https://truervs.com/rvs-for-sale?type=travel-trailer&search={urllib.parse.quote_plus(keyword)}"
 
 def build_rvenvy_url(keyword):
-    """
-    Builds clean RVEnvy search URLs strictly avoiding disallowed endpoints
-    (/api/, /login, /admin, etc.)
-    """
-    base_url = "https://rvenvy.com/rvs"
-    params = {
-        "category": "Travel Trailer",
-        "search": keyword
-    }
-    return f"{base_url}?{urllib.parse.urlencode(params)}"
-def build_truervs_url(keyword):
-    """
-    Builds clean TrueRVs search URLs strictly avoiding disallowed endpoints
-    (/api/, /trpc/, /dashboard/, /sell/, etc.)
-    """
-    base_url = "https://truervs.com/rvs-for-sale"
-    params = {
-        "type": "travel-trailer",
-        "search": keyword
-    }
-    return f"{base_url}?{urllib.parse.urlencode(params)}"
+    return f"https://rvenvy.com/rvs?category=Travel+Trailer&search={urllib.parse.quote_plus(keyword)}"
+
+def build_rvuniverse_url(keyword):
+    return f"https://www.rvuniverse.com/listings/for-sale/travel-trailers/150012?Keywords={urllib.parse.quote_plus(keyword)}"
+
+def build_autotrader_rv_url(keyword, zip_code, radius):
+    return f"https://rvs.autotrader.com/rvs-for-sale/travel_trailers-for-sale?zip={zip_code}&distance={radius}&keyword={urllib.parse.quote_plus(keyword)}"
+
+def build_rvpostings_url(keyword):
+    return f"https://www.rvpostings.com/rvs-for-sale/search.aspx?type=Travel+Trailer&q={urllib.parse.quote_plus(keyword)}"
+
+def build_smartrvguide_url(keyword):
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", keyword.strip().lower()).strip("-")
+    return f"https://www.smartrvguide.com/rvs-for-sale/{slug}"
+
 # =============================================================================
 # DATABASE & DATA SYNCHRONIZATION
 # =============================================================================
+
 def init_db():
-    db_exists = os.path.exists(DB_FILE)
-    if db_exists:
-        logging.info(f"Database file found at '{DB_FILE}'. Verifying schema...")
-    else:
-        logging.info(f"Database file not found at '{DB_FILE}'. Creating new database and tables...")
-        # Ensure parent folder exists if DB_FILE contains a subdirectory
-        parent_dir = os.path.dirname(DB_FILE)
-        if parent_dir:
-            os.makedirs(parent_dir, exist_ok=True)
+    parent_dir = os.path.dirname(DB_FILE)
+    if parent_dir:
+        os.makedirs(parent_dir, exist_ok=True)
 
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-
-    # Enable write-ahead logging for improved concurrent durability
     cursor.execute("PRAGMA journal_mode=WAL;")
 
     cursor.execute("""
@@ -179,8 +146,10 @@ def init_db():
             model_year INTEGER,
             condition TEXT,
             current_price INTEGER NOT NULL,
+            original_price INTEGER,
             first_seen TEXT NOT NULL,
             last_seen TEXT NOT NULL,
+            status TEXT DEFAULT 'active',
             url TEXT NOT NULL,
             UNIQUE(source, source_id)
         )
@@ -192,28 +161,73 @@ def init_db():
             listing_id INTEGER NOT NULL,
             source TEXT NOT NULL,
             source_id TEXT NOT NULL,
+            old_price INTEGER,
+            new_price INTEGER,
+            price_delta INTEGER,
             price INTEGER NOT NULL,
             recorded_at TEXT NOT NULL,
-            FOREIGN KEY (listing_id) REFERENCES listings(id)
+            FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE
         )
     """)
 
-    # Indices to keep duplicate checking fast as history accumulates
+    cursor.execute("PRAGMA table_info(listings)")
+    cols = [r[1] for r in cursor.fetchall()]
+    if "original_price" not in cols:
+        cursor.execute("ALTER TABLE listings ADD COLUMN original_price INTEGER")
+        cursor.execute("UPDATE listings SET original_price = current_price WHERE original_price IS NULL")
+    if "status" not in cols:
+        cursor.execute("ALTER TABLE listings ADD COLUMN status TEXT DEFAULT 'active'")
+
+    cursor.execute("""
+        CREATE TRIGGER IF NOT EXISTS trg_track_aggregator_price_change
+        AFTER UPDATE OF current_price ON listings
+        WHEN OLD.current_price != NEW.current_price
+        BEGIN
+            INSERT INTO price_history (listing_id, source, source_id, old_price, new_price, price_delta, price, recorded_at)
+            VALUES (
+                OLD.id,
+                OLD.source,
+                OLD.source_id,
+                OLD.current_price,
+                NEW.current_price,
+                NEW.current_price - OLD.current_price,
+                NEW.current_price,
+                STRFTIME('%Y-%m-%d %H:%M:%S', 'now')
+            );
+        END;
+    """)
+
+    cursor.execute("""
+        CREATE VIEW IF NOT EXISTS v_active_market_intelligence AS
+        SELECT 
+            id,
+            source,
+            source_id,
+            target_model,
+            model_year,
+            condition,
+            seller_location,
+            original_price,
+            current_price,
+            (COALESCE(original_price, current_price) - current_price) AS total_discount_amount,
+            ROUND(((COALESCE(original_price, current_price) - current_price) * 100.0 / NULLIF(original_price, 0)), 1) AS total_discount_pct,
+            CAST(julianday('now') - julianday(first_seen) AS INTEGER) AS days_on_lot,
+            CAST(julianday('now') - julianday(last_seen) AS INTEGER) AS days_since_last_seen,
+            url
+        FROM listings
+        WHERE status = 'active';
+    """)
+
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_listings_source_lookup ON listings(source, source_id);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_price_history_lookup ON price_history(source, source_id);")
 
     conn.commit()
     conn.close()
 
-    if not db_exists:
-        logging.info(f"Database initialized successfully at '{DB_FILE}'.")
-    else:
-        logging.info("Database schema verified.")
-
 def sync_unit_to_db(unit):
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     cursor.execute(
         "SELECT id, current_price FROM listings WHERE source = ? AND source_id = ?",
@@ -223,61 +237,65 @@ def sync_unit_to_db(unit):
 
     if row is None:
         cursor.execute("""
-            INSERT INTO listings (source, source_id, target_model, listing_title, seller_location, model_year, condition, current_price, first_seen, last_seen, url)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO listings (source, source_id, target_model, listing_title, seller_location, 
+                                  model_year, condition, current_price, original_price, first_seen, last_seen, status, url)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)
         """, (
             unit["source"], unit["source_id"], unit["target_model"], unit["listing_title"],
             unit.get("seller_location"), unit.get("model_year"), unit.get("condition"),
-            unit["price"], now_str, now_str, unit["url"]
+            unit["price"], unit["price"], now_str, now_str, unit["url"]
         ))
-        listing_id = cursor.lastrowid
-        cursor.execute("""
-            INSERT INTO price_history (listing_id, source, source_id, price, recorded_at)
-            VALUES (?, ?, ?, ?, ?)
-        """, (listing_id, unit["source"], unit["source_id"], unit["price"], now_str))
         conn.commit()
         conn.close()
         return ("NEW", None)
 
     listing_id, old_price = row
+    cursor.execute("""
+        UPDATE listings 
+        SET current_price = ?, last_seen = ?, status = 'active', listing_title = ?, 
+            model_year = ?, condition = ?, seller_location = ?
+        WHERE id = ?
+    """, (unit["price"], now_str, unit["listing_title"], unit.get("model_year"), unit.get("condition"), unit.get("seller_location"), listing_id))
+
+    conn.commit()
+    conn.close()
 
     if unit["price"] < old_price:
-        cursor.execute("""
-            UPDATE listings 
-            SET current_price = ?, last_seen = ?, listing_title = ?, model_year = ?, condition = ?, seller_location = ?
-            WHERE id = ?
-        """, (unit["price"], now_str, unit["listing_title"], unit.get("model_year"), unit.get("condition"), unit.get("seller_location"), listing_id))
-        cursor.execute("""
-            INSERT INTO price_history (listing_id, source, source_id, price, recorded_at)
-            VALUES (?, ?, ?, ?)
-        """, (listing_id, unit["source"], unit["source_id"], unit["price"], now_str))
-        conn.commit()
-        conn.close()
         return ("DROP", old_price)
-    else:
-        cursor.execute("""
-            UPDATE listings 
-            SET last_seen = ?, listing_title = ?, model_year = ?, condition = ?, seller_location = ?
-            WHERE id = ?
-        """, (now_str, unit["listing_title"], unit.get("model_year"), unit.get("condition"), unit.get("seller_location"), listing_id))
-        conn.commit()
-        conn.close()
-        return ("SAME", old_price)
+    elif unit["price"] > old_price:
+        return ("INCREASE", old_price)
+    return ("SAME", old_price)
+
+def mark_delisted_units(days_threshold=7):
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE listings
+        SET status = 'delisted'
+        WHERE status = 'active'
+          AND (julianday('now') - julianday(last_seen)) > ?
+    """, (days_threshold,))
+    delisted_count = cursor.rowcount
+    conn.commit()
+    conn.close()
+    if delisted_count > 0:
+        logging.info(f"Delisted detection: Marked {delisted_count} inactive units as 'delisted'.")
 
 # =============================================================================
-# DATA EXTRACTION HELPERS
+# DATA EXTRACTION HELPERS & ALERTS
 # =============================================================================
 
 def extract_price(text):
     if not text:
         return None
-    matches = re.findall(r"\$\s?([1-9][0-9]{1,2},[0-9]{3}|[1-9][0-9]{4,5})\b", text)
-    valid_prices = []
+    scrubbed = re.sub(r"(?:save|savings?|discount|off\s*msrp|down\s*payment|rebate)\s*:?\s*\$\s*([0-9,]+)", "", text, flags=re.I)
+    matches = re.findall(r"\$\s?([1-9][0-9]{1,2},[0-9]{3}|[1-9][0-9]{4,5})\b", scrubbed)
+    valid = []
     for m in matches:
         cleaned = int(m.replace(",", "").strip())
         if 10000 <= cleaned <= 180000:
-            valid_prices.append(cleaned)
-    return valid_prices[0] if valid_prices else None
+            valid.append(cleaned)
+    return valid[0] if valid else None
 
 def extract_year(text):
     if not text:
@@ -286,7 +304,7 @@ def extract_year(text):
     return int(match.group(1)) if match else None
 
 def extract_condition(text):
-    if re.search(r"\bused\b", text, re.I):
+    if re.search(r"\b(used|pre-?owned)\b", text, re.I):
         return "Used"
     if re.search(r"\bnew\b", text, re.I):
         return "New"
@@ -328,7 +346,7 @@ def send_discord_alert(unit, old_price=None):
         resp = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=10)
         time.sleep(0.5)
     except Exception as e:
-        logging.error(f"Discord ping failed: {e}")
+        logging.error(f"Discord alert failed: {e}")
 
 # =============================================================================
 # DOM PARSERS
@@ -337,363 +355,342 @@ def send_discord_alert(unit, old_price=None):
 def parse_rvtrader_page(html, target_model, clean_key):
     soup = BeautifulSoup(html, "html.parser")
     units = []
-
     cards = soup.select("div[class*='listing-card'], div[data-listing-id], article")
     for card in cards:
-        card_text = card.get_text(" ", strip=True)
-        if "$" not in card_text:
+        text = card.get_text(" ", strip=True)
+        if "$" not in text:
             continue
-
-        clean_text = re.sub(r"[^A-Z0-9]", "", card_text.upper())
+        clean_text = re.sub(r"[^A-Z0-9]", "", text.upper())
         if clean_key not in clean_text:
             continue
-
-        link_elem = card.find("a", href=lambda h: h and "/listing/" in h)
-        if not link_elem:
+        link = card.find("a", href=lambda h: h and "/listing/" in h)
+        if not link:
             continue
-
-        url = urljoin("https://www.rvtrader.com", link_elem["href"])
+        url = urljoin("https://www.rvtrader.com", link["href"])
         id_match = re.search(r"listing/.*?([0-9]{7,12})", url)
         source_id = id_match.group(1) if id_match else f"URL_{abs(hash(url))}"
 
-        price = extract_price(card_text)
-        if not price:
+        price = extract_price(text)
+        year = extract_year(text)
+        if not price or (year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR)):
             continue
 
-        year = extract_year(card_text)
-        if year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR):
-            continue
-
-        condition = extract_condition(card_text)
+        condition = extract_condition(text)
         title_elem = card.find(["h2", "h3", "h4"])
         title = title_elem.get_text(strip=True) if title_elem else f"{year or ''} {target_model}"
-
-        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", card_text)
+        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", text)
         seller_loc = loc_match.group(1).strip() if loc_match else "Regional"
 
-        if any(u["source_id"] == source_id for u in units):
-            continue
-
-        units.append({
-            "source": "RVTrader",
-            "source_id": source_id,
-            "target_model": target_model,
-            "listing_title": title,
-            "seller_location": seller_loc,
-            "model_year": year,
-            "condition": condition,
-            "price": price,
-            "url": url
-        })
+        if not any(u["source_id"] == source_id for u in units):
+            units.append({
+                "source": "RVTrader", "source_id": source_id, "target_model": target_model,
+                "listing_title": title, "seller_location": seller_loc, "model_year": year,
+                "condition": condition, "price": price, "url": url
+            })
     return units
 
 def parse_rvusa_page(html, target_model, clean_key):
     soup = BeautifulSoup(html, "html.parser")
     units = []
-
     cards = soup.select("div.listing-container, div[class*='listing-item'], div.result-item, li.listing")
-    if not cards:
-        cards = soup.find_all("div", class_=lambda c: c and "listing" in c.lower())
-
     for card in cards:
-        card_text = card.get_text(" ", strip=True)
-        if "$" not in card_text:
+        text = card.get_text(" ", strip=True)
+        if "$" not in text:
             continue
-
-        clean_text = re.sub(r"[^A-Z0-9]", "", card_text.upper())
+        clean_text = re.sub(r"[^A-Z0-9]", "", text.upper())
         if clean_key not in clean_text:
             continue
-
-        link_elem = card.find("a", href=True)
-        if not link_elem:
+        link = card.find("a", href=True)
+        if not link:
             continue
-
-        url = urljoin("https://www.rvusa.com", link_elem["href"])
-
-        # RVUSA listing links typically end with /...-id-123456 or a numeric parameter
+        url = urljoin("https://www.rvusa.com", link["href"])
         id_match = re.search(r"-([0-9]{5,10})(?:\.html|\/|$)", url)
         source_id = id_match.group(1) if id_match else f"URL_{abs(hash(url))}"
 
-        price = extract_price(card_text)
-        if not price:
+        price = extract_price(text)
+        year = extract_year(text)
+        if not price or (year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR)):
             continue
 
-        year = extract_year(card_text)
-        if year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR):
-            continue
-
-        condition = extract_condition(card_text)
-        title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "heading"]))
+        condition = extract_condition(text)
+        title_elem = card.find(["h2", "h3", "h4", "a"])
         title = title_elem.get_text(strip=True) if title_elem else f"{year or ''} {target_model}"
-
-        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", card_text)
+        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", text)
         seller_loc = loc_match.group(1).strip() if loc_match else "Regional"
 
-        if any(u["source_id"] == source_id for u in units):
-            continue
-
-        units.append({
-            "source": "RVUSA",
-            "source_id": source_id,
-            "target_model": target_model,
-            "listing_title": title,
-            "seller_location": seller_loc,
-            "model_year": year,
-            "condition": condition,
-            "price": price,
-            "url": url
-        })
+        if not any(u["source_id"] == source_id for u in units):
+            units.append({
+                "source": "RVUSA", "source_id": source_id, "target_model": target_model,
+                "listing_title": title, "seller_location": seller_loc, "model_year": year,
+                "condition": condition, "price": price, "url": url
+            })
     return units
+
 def parse_rvt_page(html, target_model, clean_key):
     soup = BeautifulSoup(html, "html.parser")
     units = []
-
-    # RVT listing cards generally use item/result wrappers or article tags
     cards = soup.select("div[class*='listing-card'], div[class*='srp-item'], div.result-item, article")
-    if not cards:
-        cards = soup.find_all("div", class_=lambda c: c and any(k in str(c).lower() for k in ["listing", "search-result"]))
-
     for card in cards:
-        card_text = card.get_text(" ", strip=True)
-        if "$" not in card_text:
+        text = card.get_text(" ", strip=True)
+        if "$" not in text:
             continue
-
-        clean_text = re.sub(r"[^A-Z0-9]", "", card_text.upper())
+        clean_text = re.sub(r"[^A-Z0-9]", "", text.upper())
         if clean_key not in clean_text:
             continue
-
-        link_elem = card.find("a", href=True)
-        if not link_elem:
+        link = card.find("a", href=True)
+        if not link:
             continue
-
-        url = urljoin("https://www.rvt.com", link_elem["href"])
-
-        # Skip disallowed utility endpoints
-        if any(bad in url for bad in ["calc", "price-checker", "printer_page", "srDisplay"]):
+        url = urljoin("https://www.rvt.com", link["href"])
+        if any(bad in url for bad in ["calc", "price-checker", "printer_page"]):
             continue
-
-        # RVT listing links typically include an ID number (e.g., /...-id-1234567.html or /item/1234567)
         id_match = re.search(r"[-_/]([0-9]{6,10})(?:\.html|\/|$)", url)
         source_id = id_match.group(1) if id_match else f"URL_{abs(hash(url))}"
 
-        price = extract_price(card_text)
-        if not price:
+        price = extract_price(text)
+        year = extract_year(text)
+        if not price or (year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR)):
             continue
 
-        year = extract_year(card_text)
-        if year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR):
-            continue
-
-        condition = extract_condition(card_text)
-        title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "heading"]))
+        condition = extract_condition(text)
+        title_elem = card.find(["h2", "h3", "h4", "a"])
         title = title_elem.get_text(strip=True) if title_elem else f"{year or ''} {target_model}"
-
-        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", card_text)
+        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", text)
         seller_loc = loc_match.group(1).strip() if loc_match else "Regional"
 
-        if any(u["source_id"] == source_id for u in units):
-            continue
-
-        units.append({
-            "source": "RVT",
-            "source_id": source_id,
-            "target_model": target_model,
-            "listing_title": title,
-            "seller_location": seller_loc,
-            "model_year": year,
-            "condition": condition,
-            "price": price,
-            "url": url
-        })
-    return units
-def parse_rvenvy_page(html, target_model, clean_key):
-    soup = BeautifulSoup(html, "html.parser")
-    units = []
-
-    # RV Envy uses card-based layout elements for vehicle listings
-    cards = soup.select("div[class*='listing-card'], div[class*='vehicle-card'], div.card, article")
-    if not cards:
-        cards = soup.find_all("div", class_=lambda c: c and any(k in str(c).lower() for k in ["listing", "vehicle", "inventory-item"]))
-
-    for card in cards:
-        card_text = card.get_text(" ", strip=True)
-        if "$" not in card_text:
-            continue
-
-        clean_text = re.sub(r"[^A-Z0-9]", "", card_text.upper())
-        if clean_key not in clean_text:
-            continue
-
-        link_elem = card.find("a", href=True)
-        if not link_elem:
-            continue
-
-        url = urljoin("https://rvenvy.com", link_elem["href"])
-
-        # robots.txt safety check: skip admin, api, account, or concierge links
-        if any(bad in url.lower() for bad in ["/admin", "/api/", "/login", "/account", "/concierge", "/profile"]):
-            continue
-
-        # Extract numeric listing ID or slug identifier
-        id_match = re.search(r"[-_/]([0-9]{5,10}|[a-f0-9-]{36})(?:\.html|\/|$)", url)
-        source_id = id_match.group(1) if id_match else f"URL_{abs(hash(url))}"
-
-        price = extract_price(card_text)
-        if not price:
-            continue
-
-        year = extract_year(card_text)
-        if year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR):
-            continue
-
-        condition = extract_condition(card_text)
-        title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "name", "heading"]))
-        title = title_elem.get_text(strip=True) if title_elem else f"{year or ''} {target_model}"
-
-        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", card_text)
-        seller_loc = loc_match.group(1).strip() if loc_match else "Regional"
-
-        if any(u["source_id"] == source_id for u in units):
-            continue
-
-        units.append({
-            "source": "RVEnvy",
-            "source_id": source_id,
-            "target_model": target_model,
-            "listing_title": title,
-            "seller_location": seller_loc,
-            "model_year": year,
-            "condition": condition,
-            "price": price,
-            "url": url
-        })
+        if not any(u["source_id"] == source_id for u in units):
+            units.append({
+                "source": "RVT", "source_id": source_id, "target_model": target_model,
+                "listing_title": title, "seller_location": seller_loc, "model_year": year,
+                "condition": condition, "price": price, "url": url
+            })
     return units
 
 def parse_truervs_page(html, target_model, clean_key):
     soup = BeautifulSoup(html, "html.parser")
     units = []
-
-    # TrueRVs card selectors (standard Next.js / Tailwind card wrappers)
     cards = soup.select("div[class*='listing-card'], div[class*='vehicle-card'], article, div[data-testid*='listing']")
-    if not cards:
-        cards = soup.find_all("div", class_=lambda c: c and any(k in str(c).lower() for k in ["listing", "rv-card", "vehicle"]))
-
     for card in cards:
-        card_text = card.get_text(" ", strip=True)
-        if "$" not in card_text:
+        text = card.get_text(" ", strip=True)
+        if "$" not in text:
             continue
-
-        clean_text = re.sub(r"[^A-Z0-9]", "", card_text.upper())
+        clean_text = re.sub(r"[^A-Z0-9]", "", text.upper())
         if clean_key not in clean_text:
             continue
-
-        link_elem = card.find("a", href=True)
-        if not link_elem:
+        link = card.find("a", href=True)
+        if not link:
             continue
-
-        url = urljoin("https://truervs.com", link_elem["href"])
-
-        # robots.txt safety filter: skip authentication, apis, and listing funnels
-        if any(bad in url.lower() for bad in ["/admin", "/dashboard", "/api", "/trpc", "/login", "/register", "/sell/"]):
-            continue
-
-        # Extract numeric listing ID or hash the URL slug
+        url = urljoin("https://truervs.com", link["href"])
         id_match = re.search(r"[-_/]([0-9]{4,10}|[a-f0-9-]{36})(?:\.html|\/|$)", url)
         source_id = id_match.group(1) if id_match else f"URL_{abs(hash(url))}"
 
-        price = extract_price(card_text)
-        if not price:
+        price = extract_price(text)
+        year = extract_year(text)
+        if not price or (year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR)):
             continue
 
-        year = extract_year(card_text)
-        if year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR):
-            continue
-
-        condition = extract_condition(card_text)
-        title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "name", "heading"]))
+        condition = extract_condition(text)
+        title_elem = card.find(["h2", "h3", "h4", "a"])
         title = title_elem.get_text(strip=True) if title_elem else f"{year or ''} {target_model}"
-
-        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", card_text)
+        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", text)
         seller_loc = loc_match.group(1).strip() if loc_match else "Regional"
 
-        if any(u["source_id"] == source_id for u in units):
+        if not any(u["source_id"] == source_id for u in units):
+            units.append({
+                "source": "TrueRVs", "source_id": source_id, "target_model": target_model,
+                "listing_title": title, "seller_location": seller_loc, "model_year": year,
+                "condition": condition, "price": price, "url": url
+            })
+    return units
+
+def parse_rvenvy_page(html, target_model, clean_key):
+    soup = BeautifulSoup(html, "html.parser")
+    units = []
+    cards = soup.select("div[class*='listing-card'], div[class*='vehicle-card'], div.card, article")
+    for card in cards:
+        text = card.get_text(" ", strip=True)
+        if "$" not in text:
+            continue
+        clean_text = re.sub(r"[^A-Z0-9]", "", text.upper())
+        if clean_key not in clean_text:
+            continue
+        link = card.find("a", href=True)
+        if not link:
+            continue
+        url = urljoin("https://rvenvy.com", link["href"])
+        id_match = re.search(r"[-_/]([0-9]{5,10}|[a-f0-9-]{36})(?:\.html|\/|$)", url)
+        source_id = id_match.group(1) if id_match else f"URL_{abs(hash(url))}"
+
+        price = extract_price(text)
+        year = extract_year(text)
+        if not price or (year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR)):
             continue
 
-        units.append({
-            "source": "TrueRVs",
-            "source_id": source_id,
-            "target_model": target_model,
-            "listing_title": title,
-            "seller_location": seller_loc,
-            "model_year": year,
-            "condition": condition,
-            "price": price,
-            "url": url
-        })
+        condition = extract_condition(text)
+        title_elem = card.find(["h2", "h3", "h4", "a"])
+        title = title_elem.get_text(strip=True) if title_elem else f"{year or ''} {target_model}"
+        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", text)
+        seller_loc = loc_match.group(1).strip() if loc_match else "Regional"
+
+        if not any(u["source_id"] == source_id for u in units):
+            units.append({
+                "source": "RVEnvy", "source_id": source_id, "target_model": target_model,
+                "listing_title": title, "seller_location": seller_loc, "model_year": year,
+                "condition": condition, "price": price, "url": url
+            })
     return units
+
 def parse_rvuniverse_page(html, target_model, clean_key):
     soup = BeautifulSoup(html, "html.parser")
     units = []
-
-    # Sandhills Global listing card selectors
-    cards = soup.select("div.listing-card, div.listing-item, div.result-item, div[class*='listing-container'], article")
-    if not cards:
-        cards = soup.find_all("div", class_=lambda c: c and any(k in str(c).lower() for k in ["listing", "result-item"]))
-
+    cards = soup.select("div.listing-card, div.listing-item, div.result-item, article")
     for card in cards:
-        card_text = card.get_text(" ", strip=True)
-        if "$" not in card_text:
+        text = card.get_text(" ", strip=True)
+        if "$" not in text:
             continue
-
-        clean_text = re.sub(r"[^A-Z0-9]", "", card_text.upper())
+        clean_text = re.sub(r"[^A-Z0-9]", "", text.upper())
         if clean_key not in clean_text:
             continue
-
-        link_elem = card.find("a", href=True)
-        if not link_elem:
+        link = card.find("a", href=True)
+        if not link:
             continue
-
-        url = urljoin("https://www.rvuniverse.com", link_elem["href"])
-
-        # robots.txt safety filter: ignore dealer portals, compare tools, and inputs
-        if any(bad in url.lower() for bad in ["/dealer/", "/compare/", "/listinginput/", "/shop/", "/registration/"]):
-            continue
-
-        # Extract numeric listing ID from URL (e.g., /listing/for-sale/12345678 or -12345678)
+        url = urljoin("https://www.rvuniverse.com", link["href"])
         id_match = re.search(r"[-_/]([0-9]{6,12})(?:\.html|\/|$)", url)
         source_id = id_match.group(1) if id_match else f"URL_{abs(hash(url))}"
 
-        price = extract_price(card_text)
-        if not price:
+        price = extract_price(text)
+        year = extract_year(text)
+        if not price or (year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR)):
             continue
 
-        year = extract_year(card_text)
-        if year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR):
-            continue
-
-        condition = extract_condition(card_text)
-        title_elem = card.find(["h2", "h3", "h4", "a"], class_=lambda c: c and any(k in str(c).lower() for k in ["title", "heading", "name"]))
+        condition = extract_condition(text)
+        title_elem = card.find(["h2", "h3", "h4", "a"])
         title = title_elem.get_text(strip=True) if title_elem else f"{year or ''} {target_model}"
-
-        loc_match = re.search(r"Location:\s*([A-Za-z\s]+,\s*[A-Z]{2})", card_text, re.IGNORECASE)
-        if not loc_match:
-            loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", card_text)
+        loc_match = re.search(r"Location:\s*([A-Za-z\s]+,\s*[A-Z]{2})", text, re.I)
         seller_loc = loc_match.group(1).strip() if loc_match else "Regional"
 
-        if any(u["source_id"] == source_id for u in units):
+        if not any(u["source_id"] == source_id for u in units):
+            units.append({
+                "source": "RVUniverse", "source_id": source_id, "target_model": target_model,
+                "listing_title": title, "seller_location": seller_loc, "model_year": year,
+                "condition": condition, "price": price, "url": url
+            })
+    return units
+
+def parse_autotrader_rv_page(html, target_model, clean_key):
+    soup = BeautifulSoup(html, "html.parser")
+    units = []
+    cards = soup.select("div[data-cmp='itemCard'], div[class*='listing-card'], article")
+    for card in cards:
+        text = card.get_text(" ", strip=True)
+        if "$" not in text:
+            continue
+        clean_text = re.sub(r"[^A-Z0-9]", "", text.upper())
+        if clean_key not in clean_text:
+            continue
+        link = card.find("a", href=True)
+        if not link:
+            continue
+        url = urljoin("https://rvs.autotrader.com", link["href"])
+        id_match = re.search(r"[-_/]([0-9]{6,10})(?:\.html|\/|$)", url)
+        source_id = id_match.group(1) if id_match else f"URL_{abs(hash(url))}"
+
+        price = extract_price(text)
+        year = extract_year(text)
+        if not price or (year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR)):
             continue
 
-        units.append({
-            "source": "RVUniverse",
-            "source_id": source_id,
-            "target_model": target_model,
-            "listing_title": title,
-            "seller_location": seller_loc,
-            "model_year": year,
-            "condition": condition,
-            "price": price,
-            "url": url
-        })
+        condition = extract_condition(text)
+        title_elem = card.find(["h2", "h3", "h4", "a"])
+        title = title_elem.get_text(strip=True) if title_elem else f"{year or ''} {target_model}"
+        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", text)
+        seller_loc = loc_match.group(1).strip() if loc_match else "Regional"
+
+        if not any(u["source_id"] == source_id for u in units):
+            units.append({
+                "source": "AutotraderRV", "source_id": source_id, "target_model": target_model,
+                "listing_title": title, "seller_location": seller_loc, "model_year": year,
+                "condition": condition, "price": price, "url": url
+            })
+    return units
+
+def parse_rvpostings_page(html, target_model, clean_key):
+    soup = BeautifulSoup(html, "html.parser")
+    units = []
+    cards = soup.select("div.item-block, div.product-box, div[class*='vehicle-item'], article")
+    if not cards:
+        cards = soup.find_all("div", class_=lambda c: c and any(k in str(c).lower() for k in ["listing", "item"]))
+
+    for card in cards:
+        text = card.get_text(" ", strip=True)
+        if "$" not in text:
+            continue
+        clean_text = re.sub(r"[^A-Z0-9]", "", text.upper())
+        if clean_key not in clean_text:
+            continue
+        link = card.find("a", href=True)
+        if not link:
+            continue
+        url = urljoin("https://www.rvpostings.com", link["href"])
+        id_match = re.search(r"[-_/]([0-9]{4,10})(?:\.aspx|\.html|\/|$)", url)
+        source_id = id_match.group(1) if id_match else f"URL_{abs(hash(url))}"
+
+        price = extract_price(text)
+        year = extract_year(text)
+        if not price or (year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR)):
+            continue
+
+        condition = extract_condition(text)
+        title_elem = card.find(["h2", "h3", "h4", "a"])
+        title = title_elem.get_text(strip=True) if title_elem else f"{year or ''} {target_model}"
+        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", text)
+        seller_loc = loc_match.group(1).strip() if loc_match else "Regional"
+
+        if not any(u["source_id"] == source_id for u in units):
+            units.append({
+                "source": "RVPostings", "source_id": source_id, "target_model": target_model,
+                "listing_title": title, "seller_location": seller_loc, "model_year": year,
+                "condition": condition, "price": price, "url": url
+            })
+    return units
+
+def parse_smartrvguide_page(html, target_model, clean_key):
+    soup = BeautifulSoup(html, "html.parser")
+    units = []
+    cards = soup.select("div.listing, div.result, div[class*='item-wrap'], li.listing")
+    if not cards:
+        cards = soup.find_all("div", class_=lambda c: c and "listing" in str(c).lower())
+
+    for card in cards:
+        text = card.get_text(" ", strip=True)
+        if "$" not in text:
+            continue
+        clean_text = re.sub(r"[^A-Z0-9]", "", text.upper())
+        if clean_key not in clean_text:
+            continue
+        link = card.find("a", href=True)
+        if not link:
+            continue
+        url = urljoin("https://www.smartrvguide.com", link["href"])
+        id_match = re.search(r"[-_/]([0-9]{4,10})(?:\.html|\/|$)", url)
+        source_id = id_match.group(1) if id_match else f"URL_{abs(hash(url))}"
+
+        price = extract_price(text)
+        year = extract_year(text)
+        if not price or (year and (year < MIN_MODEL_YEAR or year > MAX_MODEL_YEAR)):
+            continue
+
+        condition = extract_condition(text)
+        title_elem = card.find(["h2", "h3", "h4", "a"])
+        title = title_elem.get_text(strip=True) if title_elem else f"{year or ''} {target_model}"
+        loc_match = re.search(r"([A-Za-z\s]+,\s*[A-Z]{2})", text)
+        seller_loc = loc_match.group(1).strip() if loc_match else "Regional"
+
+        if not any(u["source_id"] == source_id for u in units):
+            units.append({
+                "source": "SmartRVGuide", "source_id": source_id, "target_model": target_model,
+                "listing_title": title, "seller_location": seller_loc, "model_year": year,
+                "condition": condition, "price": price, "url": url
+            })
     return units
 
 # =============================================================================
@@ -702,7 +699,7 @@ def parse_rvuniverse_page(html, target_model, clean_key):
 
 def main():
     init_db()
-    logging.info(f"Tracker initialized: checking RV Trader and RVUSA for {len(MODELS_CATALOG)} models.")
+    logging.info(f"Aggregator initialized: Checking 9 national portals for {len(MODELS_CATALOG)} models.")
 
     total_found = 0
     new_alerts = 0
@@ -729,7 +726,11 @@ def main():
                     ("RVUSA", build_rvusa_url(item["key"]), parse_rvusa_page),
                     ("RVT", build_rvt_url(item["key"], SEARCH_ZIP, SEARCH_RADIUS), parse_rvt_page),
                     ("TrueRVs", build_truervs_url(item["key"]), parse_truervs_page),
-                    ("RVEnvy", build_rvenvy_url(item["key"]), parse_rvenvy_page)
+                    ("RVEnvy", build_rvenvy_url(item["key"]), parse_rvenvy_page),
+                    ("RVUniverse", build_rvuniverse_url(item["key"]), parse_rvuniverse_page),
+                    ("AutotraderRV", build_autotrader_rv_url(item["key"], SEARCH_ZIP, SEARCH_RADIUS), parse_autotrader_rv_page),
+                    ("RVPostings", build_rvpostings_url(item["key"]), parse_rvpostings_page),
+                    ("SmartRVGuide", build_smartrvguide_url(item["key"]), parse_smartrvguide_page)
                 ]
 
                 for platform_name, url, parse_func in targets:
@@ -779,6 +780,8 @@ def main():
                 time.sleep(BATCH_REST_SECONDS)
 
         browser.close()
+
+    mark_delisted_units(days_threshold=7)
 
     logging.info(
         f"\nTracker Complete: {total_found} parsed | {new_alerts} new alerts | "
