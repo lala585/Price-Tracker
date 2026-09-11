@@ -67,38 +67,18 @@ DEALER_TEMPLATES = {
     # Pennsylvania (Dealer Spike / NetSource)
     "Susquehanna RV (PA)": "https://www.susquehannarv.com/rv-search?s=true&brand={brand}&keyword={key}",
     "RV Value Mart (PA)": "https://www.rvvaluemart.com/inventory/type/travel-trailer?search={key}",
-    "Colton RV (PA)": "https://www.coltonrvpa.com/product/travel-trailer?s=true&brand={brand}&keyword={key}",
-    "Tom Schaeffers RV (PA)": "https://www.tomschaeffers.com/product/travel-trailers?s=true&brand={brand}&keyword={key}",
-    "Petes RV Mid-Atlantic (PA)": "https://www.petesrvmidatlantic.com/rv-search?s=true&lots=1868%2C1815&types=29&brand={brand}&keyword={key}",
 
     # Ohio (Dealer Spike / NetSource)
     "RCD RV Supercenter (OH)": "https://www.rcdrv.com/rv-search?s=true&brand={brand}&keyword={key}",
-    "Meyer's Mentor RV (OH)": "https://www.meyersmentorrv.com/rv-search?s=true&brand={brand}&keyword={key}",
     "Craig Smith RV Center (OH)": "https://www.craigsmithrv.com/rv-search?s=true&brand={brand}&keyword={key}",
     "Greenlawn RV (OH)": "https://www.greenlawnrv.com/rv-search?s=true&brand={brand}&keyword={key}",
-
-    # Michigan (Dealer Spike / NetSource)
-    "Veurink's RV (MI)": "https://www.veurinksrv.com/rv-search?s=true&brand={brand}&keyword={key}",
-    "Midway RV Center (MI)": "https://www.midwayrv.com/rv-search?s=true&brand={brand}&keyword={key}",
-
-    # Vermont (Dealer Spike / NetSource)
-    "Mekkelsen RV (VT)": "https://www.mekkelsenrv.com/rv-search?s=true&types=29&brand={brand}&keyword={key}",
-    "Petes RV Vermont (VT)": "https://www.petesrvvt.com/rv-search?s=true&types=29&brand={brand}&keyword={key}",
-    "Vermont Outdoors (VT)": "https://www.vermontoutdoorsrv.com/rv-search?s=true&types=29&brand={brand}&keyword={key}",
-
-    # Northern Virginia (Dealer Spike / NetSource)
-    "Restless Wheels RV (VA)": "https://www.restlesswheels.com/rv-search?s=true&types=29&brand={brand}&keyword={key}",
 
     # Major Regional Multi-Store Networks
     "General RV Center": "https://www.generalrv.com/rv-search?s=true&types=29&brand={brand}&keyword={key}",
     "Camping World (NY/PA)": "https://rv.campingworld.com/rv-search?category=travel-trailer&keyword={key}",
     
-    # Regional Finger Lakes & Western NY Independents
-    "Ballantyne RV (NY)": "https://www.ballantynerv.com/rv-search?s=true&brand={brand}&keyword={key}",
-    
     # High-Volume Pennsylvania Dealerships
     "Ansley RV (PA)": "https://www.ansleyrv.com/rv-search?s=true&brand={brand}&keyword={key}",
-    "Stoltzfus RV (PA)": "https://www.stoltzfusrv.com/rv-search?s=true&brand={brand}&keyword={key}",
 }
 
 STEALTH_SUITE_DEALERS = {
@@ -111,46 +91,6 @@ STEALTH_SUITE_DEALERS = {
 # =============================================================================
 
 MODELS_CATALOG = [
-    {
-        "model": "Forest River Flagstaff Micro Lite 21FBRS",
-        "key": "21FBRS",
-        "std_brand": "flagstaff micro lite",
-    },
-    {
-        "model": "Forest River Rockwood Mini Lite 2109S",
-        "key": "2109S",
-        "std_brand": "rockwood mini lite",
-    },
-    {
-        "model": "Forest River r-pod RP-205",
-        "key": "205",
-        "std_brand": "r pod",
-    },
-    {
-        "model": "Forest River Flagstaff E-Pro E201SFK",
-        "key": "E201SFK",
-        "std_brand": "flagstaff e pro",
-    },
-    {
-        "model": "Forest River Rockwood Geo Pro G20SFK",
-        "key": "G20SFK",
-        "std_brand": "rockwood geo pro",
-    },
-    {
-        "model": "Forest River No Boundaries NB19.6",
-        "key": "19.6",
-        "std_brand": "no boundaries",
-    },
-    {
-        "model": "Jayco Jay Feather Micro 166FBS",
-        "key": "166FBS",
-        "std_brand": "jay feather micro",
-    },
-    {
-        "model": "Jayco Jay Feather Air 16FBS",
-        "key": "16FBS",
-        "std_brand": "jay feather air",
-    },
     {
         "model": "Coachmen Apex Nano 203RBK",
         "key": "203RBK",
@@ -167,18 +107,88 @@ MODELS_CATALOG = [
         "std_brand": "apex nano",
     },
     {
-        "model": "Coachmen Apex Nano 216RKS",
-        "key": "216RKS",
-        "std_brand": "apex nano",
-    },
-    {
         "model": "Coachmen Freedom Express Ultra Lite 192RBS",
         "key": "192RBS",
         "std_brand": "freedom express ultra lite",
     },
     {
+        "model": "Forest River Flagstaff E-Pro E19RL",
+        "key": "E19RL",
+        "std_brand": "flagstaff e pro",
+    },
+    {
+        "model": "Forest River Flagstaff E-Pro E201RBS",
+        "key": "E201RBS",
+        "std_brand": "flagstaff e pro",
+    },
+    {
+        "model": "Forest River Flagstaff E-Pro E201SFK",
+        "key": "E201SFK",
+        "std_brand": "flagstaff e pro",
+    },
+    {
+        "model": "Forest River Flagstaff Micro Lite 21FBRS",
+        "key": "21FBRS",
+        "std_brand": "flagstaff micro lite",
+    },
+    {
+        "model": "Forest River No Boundaries NB19.5",
+        "key": "19.5",
+        "std_brand": "no boundaries",
+    },
+    {
+        "model": "Forest River r-pod RP-205",
+        "key": "205",
+        "std_brand": "r pod",
+    },
+    {
+        "model": "Forest River Rockwood Geo Pro G19FBS",
+        "key": "G19FBS",
+        "std_brand": "rockwood geo pro",
+    },
+    {
+        "model": "Forest River Rockwood Geo Pro G19RL",
+        "key": "G19RL",
+        "std_brand": "rockwood geo pro",
+    },
+    {
+        "model": "Forest River Rockwood Geo Pro G19RLS",
+        "key": "G19RLS",
+        "std_brand": "rockwood geo pro",
+    },
+    {
+        "model": "Forest River Rockwood Geo Pro G20BS",
+        "key": "G20BS",
+        "std_brand": "rockwood geo pro",
+    },
+    {
+        "model": "Forest River Rockwood Geo Pro G20FK",
+        "key": "G20FK",
+        "std_brand": "rockwood geo pro",
+    },
+    {
+        "model": "Forest River Rockwood Geo Pro G20RBS",
+        "key": "G20RBS",
+        "std_brand": "rockwood geo pro",
+    },
+    {
+        "model": "Forest River Rockwood Geo Pro G20SFK",
+        "key": "G20SFK",
+        "std_brand": "rockwood geo pro",
+    },
+    {
+        "model": "Forest River Rockwood Mini Lite 2109S",
+        "key": "2109S",
+        "std_brand": "rockwood mini lite",
+    },
+    {
         "model": "Forest River Surveyor Legend 19RBLE",
         "key": "19RBLE",
+        "std_brand": "surveyor legend",
+    },
+    {
+        "model": "Forest River Surveyor Legend 202RBLE",
+        "key": "202RBLE",
         "std_brand": "surveyor legend",
     },
     {
@@ -187,84 +197,14 @@ MODELS_CATALOG = [
         "std_brand": "range lite air",
     },
     {
-        "model": "Venture RV Sonic 211VRB",
-        "key": "211VRB",
-        "std_brand": "sonic",
+        "model": "Jayco Jay Feather Air 16FBS",
+        "key": "16FBS",
+        "std_brand": "jay feather air",
     },
     {
-        "model": "Forest River Salem Hemisphere 21RBHL",
-        "key": "21RBHL",
-        "std_brand": "salem hemisphere",
-    },
-    {
-        "model": "Forest River Wildwood Heritage Glen 21RBHL",
-        "key": "21RBHL",
-        "std_brand": "wildwood heritage glen",
-    },
-    {
-        "model": "Keystone Passport SL 210RK",
-        "key": "210RK",
-        "std_brand": "passport sl",
-    },
-    {
-        "model": "Keystone Passport Classic 210RKC",
-        "key": "210RKC",
-        "std_brand": "passport classic",
-    },
-    {
-        "model": "Grand Design Imagine XLS 19RLE",
-        "key": "19RLE",
-        "std_brand": "imagine xls",
-    },
-    {
-        "model": "Keystone Passport SL 190RD",
-        "key": "190RD",
-        "std_brand": "passport sl",
-    },
-    {
-        "model": "Forest River No Boundaries NB19.5",
-        "key": "19.5",
-        "std_brand": "no boundaries",
-    },
-    {
-        "model": "Forest River r-pod RP-198",
-        "key": "198",
-        "std_brand": "r-pod",
-    },
-    {
-        "model": "Forest River r-pod RP-207",
-        "key": "207",
-        "std_brand": "r-pod",
-    },
-    {
-        "model": "Forest River No Boundaries NB18.2",
-        "key": "18.2",
-        "std_brand": "no boundaries",
-    },
-    {
-        "model": "Forest River Rockwood Geo Pro G19RL",
-        "key": "G19RL",
-        "std_brand": "rockwood geo pro",
-    },
-    {
-        "model": "Forest River Surveyor Legend 202RBLE",
-        "key": "202RBLE",
-        "std_brand": "surveyor legend",
-    },
-    {
-        "model": "Forest River Surveyor Legend 203RKLE",
-        "key": "203RKLE",
-        "std_brand": "surveyor legend",
-    },
-    {
-        "model": "Forest River Rockwood Mini Lite 2205S",
-        "key": "2205S",
-        "std_brand": "rockwood mini lite",
-    },
-    {
-        "model": "Forest River Flagstaff Micro Lite 22FBS",
-        "key": "22FBS",
-        "std_brand": "flagstaff micro lite",
+        "model": "Jayco Jay Feather Micro 166FBS",
+        "key": "166FBS",
+        "std_brand": "jay feather micro",
     },
     {
         "model": "Keystone Outback OBX 19RBS",
@@ -272,14 +212,29 @@ MODELS_CATALOG = [
         "std_brand": "outback obx",
     },
     {
-        "model": "Coachmen Apex Nano 232RBS",
-        "key": "232RBS",
-        "std_brand": "apex nano",
+        "model": "Keystone Passport Classic 210RKC",
+        "key": "210RKC",
+        "std_brand": "passport classic",
     },
     {
-        "model": "Forest River Cherokee Wolf Pup 16FQ",
-        "key": "16FQ",
-        "std_brand": "cherokee wolf pup",
+        "model": "Keystone Passport SL 190RD",
+        "key": "190RD",
+        "std_brand": "passport sl",
+    },
+    {
+        "model": "Keystone Passport SL 210RK",
+        "key": "210RK",
+        "std_brand": "passport sl",
+    },
+    {
+        "model": "Forest River No Boundaries NB19.6",
+        "key": "19.6",
+        "std_brand": "no boundaries",
+    },
+    {
+        "model": "Forest River No Boundaries NB19.4",
+        "key": "19.4",
+        "std_brand": "no boundaries",
     },
 ]
 

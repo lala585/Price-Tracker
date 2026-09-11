@@ -14,7 +14,7 @@
   jobs:
     track:
       runs-on: ubuntu-latest
-      timeout-minutes: 150 # Sized for catalog volume and pacing
+      timeout-minutes: 180 # Sized for catalog volume and pacing
 
       permissions:
         contents: read

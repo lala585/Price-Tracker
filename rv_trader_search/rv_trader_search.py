@@ -42,9 +42,9 @@ SEARCH_ZIP = "14218"
 SEARCH_RADIUS = "300"
 
 BATCH_SIZE = 4
-BATCH_REST_SECONDS = 40
-MIN_QUERY_DELAY = 10.0
-MAX_QUERY_DELAY = 20.0
+BATCH_REST_SECONDS = 30
+MIN_QUERY_DELAY = 7.0
+MAX_QUERY_DELAY = 15.0
 
 MIN_MODEL_YEAR = 2024
 MAX_MODEL_YEAR = 2027
@@ -54,41 +54,37 @@ MAX_MODEL_YEAR = 2027
 # =============================================================================
 
 MODELS_CATALOG = [
-    {"model": "Forest River Flagstaff Micro Lite 21FBRS", "key": "21FBRS"},
-    {"model": "Forest River Rockwood Mini Lite 2109S", "key": "2109S"},
-    {"model": "Forest River r-pod RP-205", "key": "RP-205"},
-    {"model": "Forest River Flagstaff E-Pro E201SFK", "key": "E201SFK"},
-    {"model": "Forest River Rockwood Geo Pro G20SFK", "key": "G20SFK"},
-    {"model": "Forest River No Boundaries NB19.5", "key": "NB19.5"},
-    {"model": "Forest River No Boundaries NB19.6", "key": "NB19.6"},
-    {"model": "Jayco Jay Feather Micro 166FBS", "key": "166FBS"},
-    {"model": "Jayco Jay Feather Air 16FBS", "key": "16FBS"},
     {"model": "Coachmen Apex Nano 203RBK", "key": "203RBK"},
     {"model": "Coachmen Apex Nano 213RDS", "key": "213RDS"},
     {"model": "Coachmen Apex Nano 224RBS", "key": "224RBS"},
-    {"model": "Coachmen Apex Nano 216RKS", "key": "216RKS"},
     {"model": "Coachmen Freedom Express Ultra Lite 192RBS", "key": "192RBS"},
-    {"model": "Forest River Surveyor Legend 19RBLE", "key": "19RBLE"},
-    {"model": "Highland Ridge Range Lite Air 16FBS", "key": "16FBS"},
-    {"model": "Venture RV Sonic 211VRB", "key": "211VRB"},
-    {"model": "Forest River Salem Hemisphere 21RBHL", "key": "21RBHL"},
-    {"model": "Forest River Wildwood Heritage Glen 21RBHL", "key": "21RBHL"},
-    {"model": "Keystone Passport SL 210RK", "key": "210RK"},
-    {"model": "Keystone Passport Classic 210RKC", "key": "210RKC"},
-    {"model": "Grand Design Imagine XLS 19RLE", "key": "19RLE"},
-    {"model": "Keystone Passport SL 190RD", "key": "190RD"},
-    {"model": "Forest River r-pod RP-198", "key": "RP-198"},
-    {"model": "Forest River r-pod RP-207", "key": "RP-207"},
-    {"model": "Forest River No Boundaries NB18.2", "key": "NB18.2"},
+    {"model": "Forest River Flagstaff E-Pro E19RL", "key": "E19RL"},
+    {"model": "Forest River Flagstaff E-Pro E201RBS", "key": "E201RBS"},
+    {"model": "Forest River Flagstaff E-Pro E201SFK", "key": "E201SFK"},
+    {"model": "Forest River Flagstaff Micro Lite 21FBRS", "key": "21FBRS"},
+    {"model": "Forest River No Boundaries NB19.5", "key": "NB19.5"},
+    {"model": "Forest River r-pod RP-205", "key": "RP-205"},
+    {"model": "Forest River Rockwood Geo Pro G19FBS", "key": "G19FBS"},
     {"model": "Forest River Rockwood Geo Pro G19RL", "key": "G19RL"},
+    {"model": "Forest River Rockwood Geo Pro G19RLS", "key": "G19RLS"},
+    {"model": "Forest River Rockwood Geo Pro G20BS", "key": "G20BS"},
+    {"model": "Forest River Rockwood Geo Pro G20FK", "key": "G20FK"},
+    {"model": "Forest River Rockwood Geo Pro G20RBS", "key": "G20RBS"},
+    {"model": "Forest River Rockwood Geo Pro G20SFK", "key": "G20SFK"},
+    {"model": "Forest River Rockwood Mini Lite 2109S", "key": "2109S"},
+    {"model": "Forest River Surveyor Legend 19RBLE", "key": "19RBLE"},
     {"model": "Forest River Surveyor Legend 202RBLE", "key": "202RBLE"},
-    {"model": "Forest River Surveyor Legend 203RKLE", "key": "203RKLE"},
-    {"model": "Forest River Rockwood Mini Lite 2205S", "key": "2205S"},
-    {"model": "Forest River Flagstaff Micro Lite 22FBS", "key": "22FBS"},
+    {"model": "Highland Ridge Range Lite Air 16FBS", "key": "16FBS"},
+    {"model": "Jayco Jay Feather Air 16FBS", "key": "16FBS"},
+    {"model": "Jayco Jay Feather Micro 166FBS", "key": "166FBS"},
     {"model": "Keystone Outback OBX 19RBS", "key": "19RBS"},
-    {"model": "Coachmen Apex Nano 232RBS", "key": "232RBS"},
-    {"model": "Forest River Cherokee Wolf Pup 16FQ", "key": "16FQ"},
+    {"model": "Keystone Passport Classic 210RKC", "key": "210RKC"},
+    {"model": "Keystone Passport SL 190RD", "key": "190RD"},
+    {"model": "Keystone Passport SL 210RK", "key": "210RK"},
+    {"model": "Forest River No Boundaries NB19.6", "key": "NB19.6"},
+    {"model": "Forest River No Boundaries NB19.4", "key": "NB19.4"},
 ]
+
 
 # =============================================================================
 # URL BUILDERS
