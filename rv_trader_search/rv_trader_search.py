@@ -46,9 +46,6 @@ MAX_MODEL_YEAR = 2027
 # =============================================================================
 
 MODELS_CATALOG = [
-    {"model": "inTech RV Sol Horizon Rover", "key": "Sol Horizon Rover"},
-    {"model": "inTech RV Sol Horizon", "key": "Sol Horizon"},
-    {"model": "Lance Camper 1475", "key": "1475"},
     {"model": "Forest River Flagstaff Micro Lite 21FBRS", "key": "21FBRS"},
     {"model": "Forest River Rockwood Mini Lite 2109S", "key": "2109S"},
     {"model": "Forest River r-pod RP-205", "key": "RP-205"},
@@ -58,7 +55,6 @@ MODELS_CATALOG = [
     {"model": "Forest River No Boundaries NB19.6", "key": "NB19.6"},
     {"model": "Jayco Jay Feather Micro 166FBS", "key": "166FBS"},
     {"model": "Jayco Jay Feather Air 16FBS", "key": "16FBS"},
-    {"model": "Winnebago Micro Minnie 2108FBS", "key": "2108FBS"},
     {"model": "Coachmen Apex Nano 203RBK", "key": "203RBK"},
     {"model": "Coachmen Apex Nano 213RDS", "key": "213RDS"},
     {"model": "Coachmen Apex Nano 224RBS", "key": "224RBS"},
@@ -69,7 +65,6 @@ MODELS_CATALOG = [
     {"model": "Venture RV Sonic 211VRB", "key": "211VRB"},
     {"model": "Forest River Salem Hemisphere 21RBHL", "key": "21RBHL"},
     {"model": "Forest River Wildwood Heritage Glen 21RBHL", "key": "21RBHL"},
-    {"model": "Heartland Mallard 210RB", "key": "210RB"},
     {"model": "Keystone Passport SL 210RK", "key": "210RK"},
     {"model": "Keystone Passport Classic 210RKC", "key": "210RKC"},
     {"model": "Grand Design Imagine XLS 19RLE", "key": "19RLE"},
@@ -77,6 +72,14 @@ MODELS_CATALOG = [
     {"model": "Forest River r-pod RP-198", "key": "RP-198"},
     {"model": "Forest River r-pod RP-207", "key": "RP-207"},
     {"model": "Forest River No Boundaries NB18.2", "key": "NB18.2"},
+    {"model": "Forest River Rockwood Geo Pro G19RL", "key": "G19RL"},
+    {"model": "Forest River Surveyor Legend 202RBLE", "key": "202RBLE"},
+    {"model": "Forest River Surveyor Legend 203RKLE", "key": "203RKLE"},
+    {"model": "Forest River Rockwood Mini Lite 2205S", "key": "2205S"},
+    {"model": "Forest River Flagstaff Micro Lite 22FBS", "key": "22FBS"},
+    {"model": "Keystone Outback OBX 19RBS", "key": "19RBS"},
+    {"model": "Coachmen Apex Nano 232RBS", "key": "232RBS"},
+    {"model": "Forest River Cherokee Wolf Pup 16FQ", "key": "16FQ"},
 ]
 
 # =============================================================================

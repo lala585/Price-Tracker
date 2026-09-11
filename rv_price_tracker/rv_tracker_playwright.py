@@ -101,21 +101,6 @@ STEALTH_SUITE_DEALERS = {
 
 MODELS_CATALOG = [
     {
-        "model": "inTech RV Sol Horizon Rover",
-        "key": "Sol Horizon Rover",
-        "std_brand": "sol horizon rover",
-    },
-    {
-        "model": "inTech RV Sol Horizon",
-        "key": "Sol Horizon",
-        "std_brand": "sol horizon",
-    },
-    {
-        "model": "Lance Camper 1475",
-        "key": "1475",
-        "std_brand": "1475",
-    },
-    {
         "model": "Forest River Flagstaff Micro Lite 21FBRS",
         "key": "21FBRS",
         "std_brand": "flagstaff micro lite",
@@ -154,11 +139,6 @@ MODELS_CATALOG = [
         "model": "Jayco Jay Feather Air 16FBS",
         "key": "16FBS",
         "std_brand": "jay feather air",
-    },
-    {
-        "model": "Winnebago Micro Minnie 2108FBS",
-        "key": "2108FBS",
-        "std_brand": "micro minnie",
     },
     {
         "model": "Coachmen Apex Nano 203RBK",
@@ -211,11 +191,6 @@ MODELS_CATALOG = [
         "std_brand": "wildwood heritage glen",
     },
     {
-        "model": "Heartland Mallard 210RB",
-        "key": "210RB",
-        "std_brand": "mallard",
-    },
-    {
         "model": "Keystone Passport SL 210RK",
         "key": "210RK",
         "std_brand": "passport sl",
@@ -254,6 +229,46 @@ MODELS_CATALOG = [
         "model": "Forest River No Boundaries NB18.2",
         "key": "18.2",
         "std_brand": "no boundaries",
+    },
+    {
+        "model": "Forest River Rockwood Geo Pro G19RL",
+        "key": "G19RL",
+        "std_brand": "rockwood geo pro",
+    },
+    {
+        "model": "Forest River Surveyor Legend 202RBLE",
+        "key": "202RBLE",
+        "std_brand": "surveyor legend",
+    },
+    {
+        "model": "Forest River Surveyor Legend 203RKLE",
+        "key": "203RKLE",
+        "std_brand": "surveyor legend",
+    },
+    {
+        "model": "Forest River Rockwood Mini Lite 2205S",
+        "key": "2205S",
+        "std_brand": "rockwood mini lite",
+    },
+    {
+        "model": "Forest River Flagstaff Micro Lite 22FBS",
+        "key": "22FBS",
+        "std_brand": "flagstaff micro lite",
+    },
+    {
+        "model": "Keystone Outback OBX 19RBS",
+        "key": "19RBS",
+        "std_brand": "outback obx",
+    },
+    {
+        "model": "Coachmen Apex Nano 232RBS",
+        "key": "232RBS",
+        "std_brand": "apex nano",
+    },
+    {
+        "model": "Forest River Cherokee Wolf Pup 16FQ",
+        "key": "16FQ",
+        "std_brand": "cherokee wolf pup",
     },
 ]
 
