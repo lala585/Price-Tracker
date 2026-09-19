@@ -46,8 +46,8 @@ DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 MIN_MODEL_YEAR = 2023
 MAX_MODEL_YEAR = 2027
 
-BATCH_SIZE = 5
-BATCH_COOLDOWN_SEC = 25
+BATCH_SIZE = 7
+BATCH_COOLDOWN_SEC = 20
 MIN_REQUEST_DELAY = 5.0
 MAX_REQUEST_DELAY = 10.0
 
@@ -70,23 +70,30 @@ DEALER_TEMPLATES = {
     # Pennsylvania (Dealer Spike / NetSource)
     "Susquehanna RV (PA)": "https://www.susquehannarv.com/rv-search?s=true&brand={brand}&keyword={key}",
     "RV Value Mart (PA)": "https://www.rvvaluemart.com/inventory/type/travel-trailer?search={key}",
+    "Ansley RV (PA)": "https://www.ansleyrv.com/rv-search?s=true&brand={brand}&keyword={key}",
+    "Juniata Valley RV (PA)": "https://www.juniatavalleyrv.com/rv-search?s=true&brand={brand}&keyword={key}",
+    "Indian Valley Camping Center (PA)": "https://www.ivccrv.com/rv-search?s=true&brand={brand}&keyword={key}",
+    "Stoltzfus RVs (PA)": "https://www.stoltzfusrv.com/rv-search?s=true&brand={brand}&keyword={key}",
+    "Fretz RV (PA)": "https://www.fretzrv.com/rv-search?s=true&brand={brand}&keyword={key}",
 
     # Ohio (Dealer Spike / NetSource)
     "RCD RV Supercenter (OH)": "https://www.rcdrv.com/rv-search?s=true&brand={brand}&keyword={key}",
     "Craig Smith RV Center (OH)": "https://www.craigsmithrv.com/rv-search?s=true&brand={brand}&keyword={key}",
     "Greenlawn RV (OH)": "https://www.greenlawnrv.com/rv-search?s=true&brand={brand}&keyword={key}",
+    "Town & Country RV (OH)": "https://www.townandcountryrv.com/rv-search?s=true&brand={brand}&keyword={key}",
+
+    # Michigan (Dealer Spike / NetSource)
+    "Tradewinds RV Center (MI)": "https://www.tradewindsrvcenter.com/rv-search?s=true&brand={brand}&keyword={key}",
 
     # Major Regional Multi-Store Networks
     "General RV Center": "https://www.generalrv.com/rv-search?s=true&types=29&brand={brand}&keyword={key}",
     "Camping World (NY/PA)": "https://rv.campingworld.com/rv-search?category=travel-trailer&keyword={key}",
-    
-    # High-Volume Pennsylvania Dealerships
-    "Ansley RV (PA)": "https://www.ansleyrv.com/rv-search?s=true&brand={brand}&keyword={key}",
 }
 
 STEALTH_SUITE_DEALERS = {
     "TerryTown RV (MI)": "https://www.terrytownrv.com/all-inventory/travel-trailers?keyword={key}",
     "Bish's RV (MI)": "https://www.bishs.com/all-inventory/travel-trailers?keyword={key}",
+    "National RV Detroit (MI)": "https://www.nationalrvdetroit.com/all-inventory/travel-trailers?keyword={key}",
 }
 
 # =============================================================================
